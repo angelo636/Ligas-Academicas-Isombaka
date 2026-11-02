@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ligas Académicas de Saúde do ISPOmbaka</title>
+
+    <!-- META TAGS ESSENCIAIS DE SEO & REDES SOCIAIS -->
+    <meta name="description" content="Portal oficial das Ligas Académicas de Saúde do ISPOmbaka em Benguela, Angola. Ensino, investigação científica, extensão comunitária e processos seletivos abertos.">
+    <meta name="keywords" content="Ligas Académicas, ISPOmbaka, Saúde, Enfermagem, Medicina Dentária, Fisioterapia, Angola, Benguela">
+    <meta name="author" content="ISPOmbaka">
+
+    <!-- Open Graph / Redes Sociais -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://isombaka.vercel.app/">
+    <meta property="og:title" content="Ligas Académicas de Saúde do ISPOmbaka">
+    <meta property="og:description" content="Plataforma centralizadora de ensino, investigação e extensão das ligas de saúde do ISPOmbaka.">
+    <meta property="og:image" content="https://isombaka.vercel.app/img/logo-isombaka.jpeg">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Ligas Académicas de Saúde do ISPOmbaka">
+    <meta name="twitter:description" content="Plataforma centralizadora de ensino, investigação e extensão das ligas de saúde do ISPOmbaka.">
+    <meta name="twitter:image" content="https://isombaka.vercel.app/img/logo-isombaka.jpeg">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        navy: { 800: '#1B2A4A', 900: '#0F1A30', 950: '#080E1A' },
+                        academic: { blue: '#1E3A8A', gold: '#D97706', emerald: '#059669' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); }
+        .glow-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.15); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans flex flex-col min-h-screen antialiased selection:bg-academic-blue selection:text-white">
+
+    <!-- HEADER & NAVEGAÇÃO -->
+    <header class="sticky top-0 z-40 glass border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('home')">
+                    <div class="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center overflow-hidden shadow-md">
+                        <img src="img/logo-isombaka.jpeg" alt="Logótipo oficial das Ligas Académicas de Saúde do ISPOmbaka" loading="lazy" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-graduation-cap text-academic-blue text-xl\'></i>';">
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-extrabold uppercase tracking-widest text-amber-600">Portal Central</span>
+                        <h1 class="text-sm sm:text-base font-black text-navy-900 leading-tight">ISPOmbaka</h1>
+                    </div>
+                </div>
+
+                <nav class="hidden xl:flex items-center space-x-1">
+                    <button onclick="navigateTo('home')" id="nav-home" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold text-academic-blue bg-blue-50">Início</button>
+                    <button onclick="navigateTo('sobre')" id="nav-sobre" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100">Sobre</button>
+                    <button onclick="navigateTo('ligas')" id="nav-ligas" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100">Ligas Académicas</button>
+                    <button onclick="navigateTo('eventos')" id="nav-eventos" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100">Eventos</button>
+                    <button onclick="navigateTo('agenda')" id="nav-agenda" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100">Agenda</button>
+                    <button onclick="navigateTo('noticias')" id="nav-noticias" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100">Notícias</button>
+                    <button onclick="navigateTo('equipa')" id="nav-equipa" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100">Equipa</button>
+                    <button onclick="navigateTo('inscrever')" id="nav-inscrever" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100">Inscrever-se</button>
+                    <button onclick="navigateTo('contactos')" id="nav-contactos" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100">Contactos</button>
+                </nav>
+
+                <div class="flex items-center space-x-2">
+                    <button onclick="navigateTo('inscrever')" class="hidden sm:inline-flex px-4 py-2.5 rounded-xl text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md transition">
+                        Fazer Inscrição
+                    </button>
+                    <button onclick="toggleMobileMenu()" class="xl:hidden p-2.5 rounded-xl text-slate-700 hover:bg-slate-100" aria-label="Abrir Menu">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden xl:hidden border-b border-slate-200 bg-white px-4 pt-2 pb-6 space-y-1">
+            <button onclick="navigateTo('home'); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-sm font-bold text-slate-800">Início</button>
+            <button onclick="navigateTo('sobre'); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-sm font-bold text-slate-800">Sobre</button>
+            <button onclick="navigateTo('ligas'); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-sm font-bold text-slate-800">Ligas Académicas</button>
+            <button onclick="navigateTo('eventos'); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-sm font-bold text-slate-800">Eventos</button>
+            <button onclick="navigateTo('agenda'); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-sm font-bold text-slate-800">Agenda</button>
+            <button onclick="navigateTo('noticias'); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-sm font-bold text-slate-800">Notícias</button>
+            <button onclick="navigateTo('equipa'); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-sm font-bold text-slate-800">Equipa</button>
+            <button onclick="navigateTo('inscrever'); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-sm font-bold text-emerald-700">Inscrever-se</button>
+            <button onclick="navigateTo('contactos'); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-sm font-bold text-slate-800">Contactos</button>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+
+        <!-- VIEW 1: INÍCIO -->
+        <div id="view-home" class="page-view">
+            <section class="bg-navy-900 text-white py-16 lg:py-24 relative overflow-hidden">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                    <span class="inline-block px-4 py-1.5 rounded-full text-xs font-black uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-4">
+                        ISPOmbaka — Formação Científica & Humana
+                    </span>
+                    <h1 class="text-3xl sm:text-5xl font-black mb-6 leading-tight">
+                        Ligas Académicas de Saúde do ISPOmbaka
+                    </h1>
+                    <p class="text-slate-300 max-w-2xl mx-auto text-sm sm:text-base mb-8">
+                        Espaços de formação complementar criados por estudantes com acompanhamento docente, focados no ensino, investigação e extensão comunitária.
+                    </p>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="navigateTo('inscrever')" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-lg transition">Inscrição Aberta</button>
+                        <button onclick="navigateTo('ligas')" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl font-bold text-sm transition">Ver Ligas</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                <div>
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <span class="text-xs font-extrabold text-amber-600 uppercase">Atualizações</span>
+                            <h2 class="text-2xl font-black text-navy-900">Últimas Notícias</h2>
+                        </div>
+                        <button onclick="navigateTo('noticias')" class="text-xs font-bold text-academic-blue hover:underline">Ver todas <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="home-noticias-summary"></div>
+                </div>
+
+                <div class="bg-slate-100 p-8 rounded-3xl border border-slate-200">
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <span class="text-xs font-extrabold text-amber-600 uppercase">Agenda Académica</span>
+                            <h2 class="text-2xl font-black text-navy-900">Próximos Eventos</h2>
+                        </div>
+                        <button onclick="navigateTo('eventos')" class="text-xs font-bold text-academic-blue hover:underline">Ver agenda <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="home-eventos-summary"></div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <span class="text-xs font-extrabold text-amber-600 uppercase">Especialidades</span>
+                            <h2 class="text-2xl font-black text-navy-900">Ligas Académicas</h2>
+                        </div>
+                        <button onclick="navigateTo('ligas')" class="text-xs font-bold text-academic-blue hover:underline">Filtrar todas as ligas <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="home-ligas-summary"></div>
+                </div>
+
+                <div class="bg-navy-900 text-white rounded-3xl p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div>
+                        <h3 class="text-xl font-black">Contacto Rápido</h3>
+                        <p class="text-slate-300 text-xs mt-1">Dúvidas sobre os processos seletivos ou parcerias?</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="https://wa.me/244926077847" target="_blank" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold flex items-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp
+                        </a>
+                        <button onclick="navigateTo('contactos')" class="px-5 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl text-xs font-extrabold">Ver Contactos</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- VIEW 2: SOBRE -->
+        <div id="view-sobre" class="page-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+                <div class="bg-white p-8 rounded-3xl border border-slate-200">
+                    <span class="text-xs font-extrabold text-amber-600 uppercase">Institucional</span>
+                    <h2 class="text-3xl font-black text-navy-900 mt-1 mb-4">Quem Somos</h2>
+                    <p class="text-slate-700 leading-relaxed text-sm sm:text-base">
+                        As Ligas Académicas de Saúde do ISPOmbaka são espaços de formação complementar criados por estudantes, com acompanhamento de docentes, destinados ao aprofundamento de conhecimentos, ao desenvolvimento de competências práticas e à promoção de ações de extensão na área da saúde.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-8 rounded-3xl border border-slate-200">
+                        <h3 class="text-xl font-black text-navy-900 mb-2"><i class="fa-solid fa-bullseye text-academic-blue mr-2"></i> Missão</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Promover a formação integral dos estudantes do ISPOmbaka através de actividades de ensino, investigação, extensão e voluntariado, fortalecendo a sua preparação científica, técnica, humana e profissional.
+                        </p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl border border-slate-200">
+                        <h3 class="text-xl font-black text-navy-900 mb-2"><i class="fa-solid fa-eye text-academic-blue mr-2"></i> Visão</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Ser referência nacional em formação complementar estudantil na área da saúde, reconhecida pela qualidade das suas ligas, pela produção científica e pelo impacto social das suas acções comunitárias.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-8 rounded-3xl border border-slate-200">
+                        <h3 class="text-xl font-black text-navy-900 mb-4"><i class="fa-solid fa-shield-halved text-amber-600 mr-2"></i> Valores</h3>
+                        <ul class="space-y-2 text-xs font-semibold text-slate-700">
+                            <li>• Ética e responsabilidade profissional.</li>
+                            <li>• Ciência, evidência e actualização constante.</li>
+                            <li>• Solidariedade e serviço à comunidade.</li>
+                            <li>• Trabalho em equipa e liderança estudantil.</li>
+                            <li>• Respeito à diversidade e aos direitos humanos.</li>
+                            <li>• Compromisso com a saúde pública.</li>
+                            <li>• Transparência na gestão das ligas.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl border border-slate-200">
+                        <h3 class="text-xl font-black text-navy-900 mb-4"><i class="fa-solid fa-list-check text-amber-600 mr-2"></i> Objectivos</h3>
+                        <ul class="space-y-2 text-xs font-semibold text-slate-700">
+                            <li>• Complementar a formação académica dos estudantes.</li>
+                            <li>• Estimular a investigação científica e a produção de conhecimentos.</li>
+                            <li>• Realizar palestras, cursos, workshops e semanas científicas.</li>
+                            <li>• Promover campanhas de prevenção e educação em saúde.</li>
+                            <li>• Aproximar estudantes, docentes, profissionais de saúde e comunidade.</li>
+                            <li>• Desenvolver liderança, comunicação, organização e trabalho em equipa.</li>
+                            <li>• Criar oportunidades de voluntariado, estágios e networking.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 p-6 rounded-2xl border border-blue-200">
+                    <h3 class="font-extrabold text-navy-900 text-sm">Fundação</h3>
+                    <p class="text-slate-600 text-xs mt-1">Criadas com o intuito de integrar os cursos do ISPOmbaka ao ecossistema prático de saúde angolano.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: LIGAS ACADÉMICAS -->
+        <div id="view-ligas" class="page-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div id="ligas-main-list">
+                    <div class="mb-8">
+                        <span class="text-xs font-extrabold text-amber-600 uppercase">Catálogo Completo</span>
+                        <h2 class="text-3xl font-black text-navy-900 mt-1">Ligas Académicas</h2>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Pesquisar por nome ou sigla</label>
+                            <input type="text" id="filter-search" oninput="applyLigasFilter()" placeholder="Ex: LAECI ou Anatomia..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Filtrar por Curso</label>
+                            <select id="filter-curso" onchange="applyLigasFilter()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold">
+                                <option value="">Todos os Cursos</option>
+                                <option value="Enfermagem">Enfermagem</option>
+                                <option value="Farmácia">Farmácia</option>
+                                <option value="Fisioterapia">Fisioterapia</option>
+                                <option value="Análises Clínicas">Análises Clínicas</option>
+                                <option value="Medicina Dentária">Medicina Dentária</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Filtrar por Estado</label>
+                            <select id="filter-estado" onchange="applyLigasFilter()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold">
+                                <option value="">Todos os Estados</option>
+                                <option value="Activa">Activa</option>
+                                <option value="Em formação">Em formação</option>
+                                <option value="Inscrições abertas">Inscrições abertas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Filtrar por Tema</label>
+                            <select id="filter-tema" onchange="applyLigasFilter()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold">
+                                <option value="">Todos os Temas</option>
+                                <option value="Saúde Materno-Infantil">Saúde Materno-Infantil</option>
+                                <option value="Urgência">Urgência & Emergência</option>
+                                <option value="Saúde Pública">Saúde Pública</option>
+                                <option value="Anatomia">Anatomia & Fisiologia</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="ligas-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+
+                <div id="liga-detail-page" class="hidden">
+                    <button onclick="closeLigaDetail()" class="mb-6 px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-xl text-xs font-extrabold flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Voltar à Lista de Ligas
+                    </button>
+                    <div id="liga-detail-content" class="bg-white rounded-3xl border border-slate-200 p-8"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- VIEW 4: EVENTOS -->
+        <div id="view-eventos" class="page-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+                <div>
+                    <h2 class="text-3xl font-black text-navy-900">Eventos</h2>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-black text-navy-900 mb-4 border-l-4 border-emerald-500 pl-3">Eventos Futuros</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="eventos-futuros-grid"></div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-black text-navy-900 mb-4 border-l-4 border-slate-400 pl-3">Eventos Realizados</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="eventos-realizados-grid"></div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-black text-navy-900 mb-4 border-l-4 border-amber-500 pl-3">Galeria de Eventos</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-slate-200 h-44 rounded-2xl flex items-center justify-center font-bold text-slate-500">Registo Fotográfico 1</div>
+                        <div class="bg-slate-200 h-44 rounded-2xl flex items-center justify-center font-bold text-slate-500">Registo Fotográfico 2</div>
+                        <div class="bg-slate-200 h-44 rounded-2xl flex items-center justify-center font-bold text-slate-500">Registo Fotográfico 3</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 5: AGENDA -->
+        <div id="view-agenda" class="page-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div>
+                    <h2 class="text-3xl font-black text-navy-900">Agenda Académica</h2>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                        <h3 class="font-extrabold text-navy-900 mb-4 text-base"><i class="fa-solid fa-calendar-days text-academic-blue mr-2"></i> Calendário Mensal</h3>
+                        <div class="p-4 bg-slate-50 rounded-2xl text-center text-xs font-bold text-slate-600">
+                            [Outubro / Novembro 2026]
+                            <div class="mt-4 grid grid-cols-7 gap-2 text-[10px]">
+                                <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+                                <span class="p-2 bg-white rounded border">25</span>
+                                <span class="p-2 bg-white rounded border">26</span>
+                                <span class="p-2 bg-white rounded border">27</span>
+                                <span class="p-2 bg-white rounded border">28</span>
+                                <span class="p-2 bg-emerald-100 border border-emerald-300 font-extrabold">29</span>
+                                <span class="p-2 bg-white rounded border">30</span>
+                                <span class="p-2 bg-white rounded border">31</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200">
+                        <h3 class="font-extrabold text-navy-900 mb-4 text-base"><i class="fa-solid fa-clock text-amber-600 mr-2"></i> Actividades por Liga</h3>
+                        <div class="space-y-3" id="agenda-actividades-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 6: NOTÍCIAS -->
+        <div id="view-noticias" class="page-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div>
+                    <h2 class="text-3xl font-black text-navy-900">Notícias & Publicações</h2>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-black text-navy-900 mb-4">Últimas Publicações</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="noticias-full-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 7: EQUIPA -->
+        <div id="view-equipa" class="page-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+                <div>
+                    <h2 class="text-3xl font-black text-navy-900">Equipa e Liderança</h2>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl border border-slate-200">
+                    <h3 class="text-xl font-black text-navy-900 mb-6 border-b pb-3">Direcção Geral</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                            <span class="text-[10px] font-extrabold uppercase text-amber-600">Presidente</span>
+                            <h4 class="font-bold text-navy-900 text-sm mt-1">Direção Estudantil</h4>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                            <span class="text-[10px] font-extrabold uppercase text-amber-600">Vice-presidente</span>
+                            <h4 class="font-bold text-navy-900 text-sm mt-1">Direção Estudantil</h4>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                            <span class="text-[10px] font-extrabold uppercase text-amber-600">Secretaria</span>
+                            <h4 class="font-bold text-navy-900 text-sm mt-1">Gestão Académica</h4>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                            <span class="text-[10px] font-extrabold uppercase text-amber-600">Coordenador de Ensino e Extensão</span>
+                            <h4 class="font-bold text-navy-900 text-sm mt-1">Corpo Docente</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl border border-slate-200">
+                    <h3 class="text-xl font-black text-navy-900 mb-6 border-b pb-3">Representantes das Coordenações das Ligas</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="equipa-coordenacoes-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 8: INSCREVER-SE -->
+        <div id="view-inscrever" class="page-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-8">
+                        <span class="text-xs font-extrabold text-emerald-600 uppercase">Adesão Online</span>
+                        <h2 class="text-2xl font-black text-navy-900 mt-1 mb-2">Formulário de Inscrição</h2>
+                        <p class="text-slate-600 text-xs mb-6">Preencha a sua candidatura. O envio é processado instantaneamente para a nossa base de dados.</p>
+
+                        <!-- FORMULÁRIO ATUALIZADO PARA LIGAR AO RENDER -->
+                        <form id="formInscricao" onsubmit="submitInscricaoInstant(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Liga Pretendida</label>
+                                <select id="ins-liga" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-navy-900">
+                                    <option value="">Selecione uma liga...</option>
+                                    <option value="Liga de Tecnologia e Inovação">Liga de Tecnologia e Inovação</option>
+                                    <option value="Liga de Enfermagem">Liga de Enfermagem</option>
+                                    <option value="Liga de Fisioterapia">Liga de Fisioterapia</option>
+                                    <option value="Liga de Farmácia">Liga de Farmácia</option>
+                                    <option value="Liga de Medicina Dentária">Liga de Medicina Dentária</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Nome Completo</label>
+                                    <input type="text" id="ins-nome" required placeholder="Seu nome" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Nº de Matrícula / Estudante</label>
+                                    <input type="text" id="ins-matricula" required placeholder="Ex: 2026102" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">E-mail</label>
+                                    <input type="email" id="ins-email" required placeholder="seuemail@exemplo.com" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Contacto Telefónico / WhatsApp</label>
+                                    <input type="tel" id="ins-tel" required placeholder="+244 9..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                                </div>
+                            </div>
+                            <button type="submit" id="btnSubmitInscricao" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl transition text-xs shadow-md">
+                                Submeter Candidatura Instantânea
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="bg-white rounded-3xl border border-slate-200 p-8">
+                        <h3 class="text-lg font-black text-navy-900 mb-4"><i class="fa-solid fa-circle-question text-amber-500 mr-2"></i> Perguntas Frequentes</h3>
+                        <div class="space-y-4 text-xs">
+                            <div>
+                                <strong class="text-navy-900 block font-bold mb-1">Quem pode candidatar-se?</strong>
+                                <p class="text-slate-600">Estudantes matriculados nos cursos de saúde do ISPOmbaka.</p>
+                            </div>
+                            <div>
+                                <strong class="text-navy-900 block font-bold mb-1">Quantas ligas posso integrar?</strong>
+                                <p class="text-slate-600">Recomenda-se a participação em no máximo 2 ligas simultâneas.</p>
+                            </div>
+                            <div>
+                                <strong class="text-navy-900 block font-bold mb-1">Haverá certificado?</strong>
+                                <p class="text-slate-600">Sim, emitido após cumprimento da taxa mínima de frequência e extensão.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 9: CONTACTOS -->
+        <div id="view-contactos" class="page-view hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div>
+                    <h2 class="text-3xl font-black text-navy-900">Contactos e Localização</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <a href="https://wa.me/244926077847" target="_blank" class="bg-white p-6 rounded-2xl border border-slate-200 flex items-center gap-4 hover:border-emerald-500 transition">
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-2xl"><i class="fa-brands fa-whatsapp"></i></div>
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">Atendimento</span>
+                            <h4 class="font-black text-navy-900 text-sm">WhatsApp Oficial</h4>
+                            <p class="text-xs text-slate-600 mt-0.5">+244 926 077 847</p>
+                        </div>
+                    </a>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-blue-100 text-academic-blue rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-envelope"></i></div>
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">E-mail</span>
+                            <h4 class="font-black text-navy-900 text-sm">Correio Eletrónico</h4>
+                            <p class="text-xs text-slate-600 mt-0.5">angeloenoc40@gmail.com</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-location-dot"></i></div>
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">Localização</span>
+                            <h4 class="font-black text-navy-900 text-sm">Campus ISPOmbaka</h4>
+                            <p class="text-xs text-slate-600 mt-0.5">Benguela, Angola</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 bg-slate-200 rounded-3xl h-64 flex items-center justify-center text-slate-500 font-bold text-sm">
+                        [Mapa do Campus ISPOmbaka]
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                        <h4 class="font-black text-navy-900 mb-4 text-sm">Redes Sociais</h4>
+                        <div class="space-y-3 text-xs font-bold">
+                            <a href="#" class="flex items-center gap-2 text-slate-700 hover:text-academic-blue"><i class="fa-brands fa-facebook text-lg"></i> Facebook ISPOmbaka</a>
+                            <a href="#" class="flex items-center gap-2 text-slate-700 hover:text-academic-blue"><i class="fa-brands fa-instagram text-lg"></i> Instagram Ligas</a>
+                            <a href="#" class="flex items-center gap-2 text-slate-700 hover:text-academic-blue"><i class="fa-brands fa-linkedin text-lg"></i> LinkedIn Académico</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL DE CONFIRMAÇÃO INSTANTÂNEA DE INSCRIÇÃO -->
+    <div id="modal-success" class="fixed inset-0 z-50 hidden bg-navy-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 text-center shadow-2xl border border-slate-100">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 class="text-xl font-black text-navy-900 mb-2">Inscrição Submetida!</h3>
+            <p class="text-xs text-slate-600 mb-6 leading-relaxed">
+                A sua candidatura foi gravada com sucesso na base de dados em nuvem e a notificação por e-mail foi disparada.
+            </p>
+            <button onclick="closeSuccessModal()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs">
+                Concluir
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-navy-950 text-slate-400 py-10 border-t border-slate-800 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p>&copy; 2026 Ligas Académicas de Saúde do ISPOmbaka. Todos os direitos reservados.</p>
+            <p class="font-bold text-slate-300">Benguela, Angola</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT & DADOS -->
+    <script>
+        const API_URL = 'https://isombaka-api.onrender.com';
+
+        const ligasData = [
+            { id: 'laas', sigla: 'LAAS', nome: 'Liga Académica de Anatomia Sistémica', curso: 'Enfermagem', estado: 'Activa', tema: 'Anatomia', pres: 'Estudante Resp.', vice: 'Vice Resp.', sec: 'Secretaria', prec: 'Prof. Preceptor', desc: 'Nota introdutória: Estudo dissecativo e correlação anatomoclínica.' },
+            { id: 'lafc', sigla: 'LAFC', nome: 'Liga Académica de Farmacologia Clínica', curso: 'Farmácia', estado: 'Inscrições abertas', tema: 'Urgência', pres: 'Estudante Resp.', vice: 'Vice Resp.', sec: 'Secretaria', prec: 'Prof. Preceptor', desc: 'Nota introdutória: Farmacodinâmica e segurança na terapêutica.' },
+            { id: 'laep', sigla: 'LAEP', nome: 'Liga Académica de Enfermagem em Pediatria', curso: 'Enfermagem', estado: 'Activa', tema: 'Saúde Materno-Infantil', pres: 'Estudante Resp.', vice: 'Vice Resp.', sec: 'Secretaria', prec: 'Prof. Preceptor', desc: 'Nota introdutória: Cuidados pediátricos e acompanhamento neonatal.' },
+            { id: 'laescf', sigla: 'LAESCF', nome: 'Liga de Saúde Comunitária e Familiar', curso: 'Fisioterapia', estado: 'Activa', tema: 'Saúde Pública', pres: 'Estudante Resp.', vice: 'Vice Resp.', sec: 'Secretaria', prec: 'Prof. Preceptor', desc: 'Nota introdutória: Extensão comunitária e atenção primária.' },
+            { id: 'laeci', sigla: 'LAECI', nome: 'Enfermagem em Cuidados Intensivos', curso: 'Enfermagem', estado: 'Inscrições abertas', tema: 'Urgência', pres: 'Estudante Resp.', vice: 'Vice Resp.', sec: 'Secretaria', prec: 'Prof. Preceptor', desc: 'Nota introdutória: Suporte avançado de vida e paciente crítico.' },
+            { id: 'lafem', sigla: 'LAFEM', nome: 'Fisiologia Endócrina e Metabólica', curso: 'Análises Clínicas', estado: 'Em formação', tema: 'Anatomia', pres: 'Estudante Resp.', vice: 'Vice Resp.', sec: 'Secretaria', prec: 'Prof. Preceptor', desc: 'Nota introdutória: Distúrbios metabólicos e diagnóstico.' },
+            { id: 'laomd', sigla: 'LAOMD', nome: 'Liga de Odontologia e Saúde Oral', curso: 'Medicina Dentária', estado: 'Em formação', tema: 'Saúde Pública', pres: 'Estudante Resp.', vice: 'Vice Resp.', sec: 'Secretaria', prec: 'Prof. Preceptor', desc: 'Nota introdutória: Cuidados e higiene oral preventiva.' }
+        ];
+
+        const noticiasData = [
+            { titulo: 'Abertura das Inscrições para as Ligas 2026', data: 'Outubro 2026', liga: 'Geral', desc: 'Estão abertas as candidaturas para estudantes do ISPOmbaka.' },
+            { titulo: 'Simpósio de Farmacologia Clínica', data: 'Novembro 2026', liga: 'LAFC', desc: 'Evento abordará segurança medicamentosa.' },
+            { titulo: 'Ação Comunitária de Rastreio', data: 'Novembro 2026', liga: 'LAESCF', desc: 'Atendimento de prevenção em comunidades locais.' }
+        ];
+
+        const eventosData = [
+            { titulo: 'I Jornada Científica de Urgência', data: '15 Nov 2026', estado: 'futuro', desc: 'Mesa redonda sobre suporte básico.' },
+            { titulo: 'Workshop de Dissecção Anatómica', data: '10 Out 2026', estado: 'realizado', desc: 'Atividade prática de anatomia sistémica.' }
+        ];
+
+        function navigateTo(viewId) {
+            document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById('view-' + viewId);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-academic-blue', 'bg-blue-50');
+                btn.classList.add('text-slate-700');
+            });
+            const activeNav = document.getElementById('nav-' + viewId);
+            if (activeNav) activeNav.classList.add('text-academic-blue', 'bg-blue-50');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function renderLigas(items) {
+            const grid = document.getElementById('ligas-grid');
+            if (!grid) return;
+            grid.innerHTML = items.map(l => `
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm glow-card flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-black px-2 py-0.5 bg-blue-50 text-academic-blue rounded border border-blue-200">${l.sigla}</span>
+                            <span class="text-[10px] font-bold text-slate-500">${l.curso}</span>
+                        </div>
+                        <h3 class="font-extrabold text-navy-900 text-base mb-1">${l.nome}</h3>
+                        <p class="text-xs text-slate-600 line-clamp-2">${l.desc}</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t flex justify-between items-center">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded ${l.estado === 'Activa' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${l.estado}</span>
+                        <button onclick="openLigaDetail('${l.id}')" class="text-xs font-bold text-academic-blue hover:underline">Ver Página <i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function applyLigasFilter() {
+            const search = document.getElementById('filter-search').value.toLowerCase();
+            const curso = document.getElementById('filter-curso').value;
+            const estado = document.getElementById('filter-estado').value;
+            const tema = document.getElementById('filter-tema').value;
+
+            const filtered = ligasData.filter(l => {
+                const matchesSearch = l.nome.toLowerCase().includes(search) || l.sigla.toLowerCase().includes(search);
+                const matchesCurso = !curso || l.curso === curso;
+                const matchesEstado = !estado || l.estado === estado;
+                const matchesTema = !tema || l.tema === tema;
+                return matchesSearch && matchesCurso && matchesEstado && matchesTema;
+            });
+
+            renderLigas(filtered);
+        }
+
+        function openLigaDetail(id) {
+            const liga = ligasData.find(l => l.id === id);
+            if (!liga) return;
+
+            document.getElementById('ligas-main-list').classList.add('hidden');
+            const detailPage = document.getElementById('liga-detail-page');
+            detailPage.classList.remove('hidden');
+
+            document.getElementById('liga-detail-content').innerHTML = `
+                <div class="border-b pb-6 mb-6">
+                    <span class="text-xs font-black text-amber-600 uppercase">${liga.curso} • ${liga.estado}</span>
+                    <h1 class="text-3xl font-black text-navy-900 mt-1">${liga.sigla} — ${liga.nome}</h1>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-black text-navy-900 uppercase tracking-wider mb-2">Nota Introdutória</h3>
+                        <p class="text-slate-700 text-sm leading-relaxed bg-slate-50 p-4 rounded-2xl border">${liga.desc}</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-black text-navy-900 uppercase tracking-wider mb-3">Corpo Diretivo e Membros</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-bold">
+                            <div class="p-3 bg-blue-50 rounded-xl text-academic-blue"><span class="block text-[10px] text-slate-400 uppercase">Presidente</span>${liga.pres}</div>
+                            <div class="p-3 bg-blue-50 rounded-xl text-academic-blue"><span class="block text-[10px] text-slate-400 uppercase">Vice-Presidente</span>${liga.vice}</div>
+                            <div class="p-3 bg-blue-50 rounded-xl text-academic-blue"><span class="block text-[10px] text-slate-400 uppercase">Secretaria</span>${liga.sec}</div>
+                            <div class="p-3 bg-blue-50 rounded-xl text-academic-blue"><span class="block text-[10px] text-slate-400 uppercase">Preceptor</span>${liga.prec}</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-black text-navy-900 uppercase tracking-wider mb-2">Actividades Programadas</h3>
+                        <p class="text-xs text-slate-600">• Reuniões científicas quinzenais, simpósios e campanhas de extensão.</p>
+                    </div>
+
+                    <div class="pt-4 border-t flex gap-4">
+                        <button onclick="document.getElementById('ins-liga').value='${liga.nome}'; navigateTo('inscrever');" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold">Inscrever-se nesta Liga</button>
+                    </div>
+                </div>
+            `;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeLigaDetail() {
+            document.getElementById('liga-detail-page').classList.add('hidden');
+            document.getElementById('ligas-main-list').classList.remove('hidden');
+        }
+
+        // FUNÇÃO DE SUBMISSÃO DA INSCRIÇÃO LIGADA AO RENDER.COM
+        async function submitInscricaoInstant(e) {
+            e.preventDefault();
+
+            const btnSubmit = document.getElementById('btnSubmitInscricao');
+            const textoOriginal = btnSubmit.innerText;
+            
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = 'A processar inscrição (a acordar servidor)...';
+
+            const payload = {
+                liga_id: document.getElementById('ins-liga').value,
+                nome_completo: document.getElementById('ins-nome').value,
+                matricula: document.getElementById('ins-matricula').value,
+                email: document.getElementById('ins-email').value,
+                telefone: document.getElementById('ins-tel').value
+            };
+
+            try {
+                const resposta = await fetch(`${API_URL}/api/inscricao`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const resultado = await resposta.json();
+
+                if (resposta.ok) {
+                    document.getElementById('modal-success').classList.remove('hidden');
+                    e.target.reset();
+                } else {
+                    alert('❌ Erro no registo: ' + (resultado.message || 'Falha ao processar os dados.'));
+                }
+            } catch (erro) {
+                console.error('Erro ao conectar com a API:', erro);
+                alert('⚠️ Não foi possível estabelecer ligação com o servidor backend no Render. Tente novamente em instantes.');
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = textoOriginal;
+            }
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('modal-success').classList.add('hidden');
+        }
+
+        function renderSummaries() {
+            renderLigas(ligasData);
+
+            const notGrid = document.getElementById('home-noticias-summary');
+            if (notGrid) {
+                notGrid.innerHTML = noticiasData.map(n => `
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200">
+                        <span class="text-[10px] font-bold text-amber-600 uppercase">${n.liga}</span>
+                        <h4 class="font-extrabold text-navy-900 text-sm mt-1">${n.titulo}</h4>
+                        <p class="text-xs text-slate-600 mt-2">${n.desc}</p>
+                    </div>
+                `).join('');
+            }
+
+            const evGrid = document.getElementById('home-eventos-summary');
+            if (evGrid) {
+                evGrid.innerHTML = eventosData.map(e => `
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 flex justify-between items-center">
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">${e.data}</span>
+                            <h4 class="font-extrabold text-navy-900 text-sm mt-1">${e.titulo}</h4>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded ${e.estado === 'futuro' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}">${e.estado}</span>
+                    </div>
+                `).join('');
+            }
+
+            const ligHome = document.getElementById('home-ligas-summary');
+            if (ligHome) {
+                ligHome.innerHTML = ligasData.slice(0, 4).map(l => `
+                    <div onclick="navigateTo('ligas'); openLigaDetail('${l.id}');" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-academic-blue">
+                        <span class="text-[10px] font-bold text-academic-blue">${l.sigla}</span>
+                        <h4 class="font-bold text-navy-900 text-xs mt-1">${l.nome}</h4>
+                    </div>
+                `).join('');
+            }
+
+            const futGrid = document.getElementById('eventos-futuros-grid');
+            if (futGrid) {
+                futGrid.innerHTML = eventosData.filter(e => e.estado === 'futuro').map(e => `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                        <span class="text-xs font-bold text-emerald-600">${e.data}</span>
+                        <h4 class="font-extrabold text-navy-900 text-base mt-1">${e.titulo}</h4>
+                        <p class="text-xs text-slate-600 mt-2">${e.desc}</p>
+                    </div>
+                `).join('');
+            }
+
+            const realGrid = document.getElementById('eventos-realizados-grid');
+            if (realGrid) {
+                realGrid.innerHTML = eventosData.filter(e => e.estado === 'realizado').map(e => `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500">${e.data}</span>
+                        <h4 class="font-extrabold text-navy-900 text-base mt-1">${e.titulo}</h4>
+                        <p class="text-xs text-slate-600 mt-2">${e.desc}</p>
+                    </div>
+                `).join('');
+            }
+
+            const agList = document.getElementById('agenda-actividades-list');
+            if (agList) {
+                agList.innerHTML = ligasData.map(l => `
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+                        <div><strong class="text-navy-900">${l.sigla}</strong> — Reunião científica quinzenal</div>
+                        <span class="text-slate-500 font-bold">17:00</span>
+                    </div>
+                `).join('');
+            }
+
+            const notFull = document.getElementById('noticias-full-grid');
+            if (notFull) {
+                notFull.innerHTML = noticiasData.map(n => `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                        <span class="text-xs font-bold text-amber-600">${n.liga} • ${n.data}</span>
+                        <h3 class="font-extrabold text-navy-900 text-base mt-1">${n.titulo}</h3>
+                        <p class="text-xs text-slate-600 mt-2">${n.desc}</p>
+                    </div>
+                `).join('');
+            }
+
+            const eqGrid = document.getElementById('equipa-coordenacoes-grid');
+            if (eqGrid) {
+                eqGrid.innerHTML = ligasData.map(l => `
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                        <span class="text-[10px] font-extrabold uppercase text-academic-blue">${l.sigla}</span>
+                        <h4 class="font-bold text-navy-900 text-xs mt-1">Coordenação ${l.curso}</h4>
+                    </div>
+                `).join('');
+            }
+        }
+
+        window.onload = renderSummaries;
+    </script>
+</body>
+</html>

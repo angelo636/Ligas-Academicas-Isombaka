@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Ligas Académicas de Saúde do ISPOmbaka</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        navy: { 800: '#1B2A4A', 900: '#0F1A30', 950: '#080E1A' },
+                        academic: { blue: '#1E3A8A', gold: '#D97706', emerald: '#059669' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- HEADER ADMIN -->
+    <header class="bg-navy-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-academic-blue text-white flex items-center justify-center font-black">
+                    IS
+                </div>
+                <div>
+                    <span class="block text-[9px] font-extrabold uppercase tracking-widest text-amber-500">Gestão Institucional</span>
+                    <h1 class="text-sm font-black tracking-wide">Painel Administrativo - ISPOmbaka</h1>
+                </div>
+            </div>
+            <div id="admin-user-info" class="hidden flex items-center gap-4 text-xs font-bold">
+                <span class="text-emerald-400"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Sistema Online</span>
+                <button onclick="logoutAdmin()" class="px-3 py-1.5 bg-red-600/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-600 hover:text-white transition">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+
+        <!-- ECRÃ DE AUTENTICAÇÃO -->
+        <div id="auth-section" class="max-w-md mx-auto bg-white p-8 rounded-3xl border border-slate-200 shadow-sm mt-12">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-blue-50 text-academic-blue rounded-2xl flex items-center justify-center text-xl mx-auto mb-3">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h2 class="text-xl font-black text-navy-900">Acesso Restrito</h2>
+                <p class="text-xs text-slate-500 mt-1">Insira a palavra-passe de administrador para gerir as candidaturas.</p>
+            </div>
+
+            <form onsubmit="autenticarAdmin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Palavra-passe</label>
+                    <input type="password" id="input-password" required placeholder="Insira a palavra-passe..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold">
+                </div>
+                <button type="submit" id="btn-login" class="w-full py-3.5 bg-academic-blue hover:bg-blue-900 text-white font-black rounded-xl transition text-xs shadow-md">
+                    Entrar no Painel
+                </button>
+            </form>
+            <div id="auth-error" class="hidden mt-4 text-center text-xs font-bold text-red-600">
+                ❌ Palavra-passe incorreta. Tente novamente.
+            </div>
+        </div>
+
+        <!-- ECRÃ DO DASHBOARD DE GESTÃO -->
+        <div id="dashboard-section" class="hidden space-y-6">
+            
+            <!-- CABEÇALHO DA TABELA -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200">
+                <div>
+                    <span class="text-xs font-extrabold text-amber-600 uppercase">Base de Dados Central</span>
+                    <h2 class="text-2xl font-black text-navy-900 mt-0.5">Gestão de Candidaturas</h2>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="carregarInscricoes()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-extrabold flex items-center gap-2 transition">
+                        <i class="fa-solid fa-rotate"></i> Atualizar Lista
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABELA DE INSCRIÇÕES -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 uppercase font-black tracking-wider border-b border-slate-200">
+                                <th class="p-4">Estudante</th>
+                                <th class="p-4">Contacto & E-mail</th>
+                                <th class="p-4">Matrícula</th>
+                                <th class="p-4">Liga Pretendida</th>
+                                <th class="p-4">Estado</th>
+                                <th class="p-4 text-center">Ações de Gestão</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-inscricoes-body" class="divide-y divide-slate-100">
+                            <!-- Preenchido via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-navy-950 text-slate-400 py-6 border-t border-slate-800 text-xs text-center">
+        <p>&copy; 2026 Ligas Académicas de Saúde do ISPOmbaka. Painel de Controlo Administrativo.</p>
+    </footer>
+
+    <!-- SCRIPT DE GESTÃO E LIGAÇÃO À NUVEM -->
+    <script>
+        const API_URL = 'https://isombaka-api.onrender.com';
+        let storedPassword = '';
+
+        async function autenticarAdmin(event) {
+            event.preventDefault();
+            const pwd = document.getElementById('input-password').value;
+            const errorMsg = document.getElementById('auth-error');
+            const btnLogin = document.getElementById('btn-login');
+            
+            errorMsg.classList.add('hidden');
+            btnLogin.disabled = true;
+            btnLogin.innerText = 'A validar acesso...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/inscricoes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pwd })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.sucesso) {
+                    storedPassword = pwd;
+                    document.getElementById('auth-section').classList.add('hidden');
+                    document.getElementById('dashboard-section').classList.remove('hidden');
+                    document.getElementById('admin-user-info').classList.remove('hidden');
+                    renderizarTabela(data.dados || []);
+                } else {
+                    errorMsg.innerText = '❌ ' + (data.mensagem || 'Palavra-passe incorreta. Tente novamente.');
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('⚠️ Não foi possível estabelecer ligação com o servidor backend. Aguarde alguns segundos enquanto o Render acorda e tente novamente.');
+            } finally {
+                btnLogin.disabled = false;
+                btnLogin.innerText = 'Entrar no Painel';
+            }
+        }
+
+        async function carregarInscricoes() {
+            if (!storedPassword) return;
+            try {
+                const response = await fetch(`${API_URL}/api/admin/inscricoes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: storedPassword })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    renderizarTabela(data.dados || []);
+                }
+            } catch (err) {
+                console.error('Erro ao atualizar lista:', err);
+            }
+        }
+
+        function renderizarTabela(inscricoes) {
+            const tbody = document.getElementById('tabela-inscricoes-body');
+            tbody.innerHTML = '';
+
+            if (!inscricoes || inscricoes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-500 font-bold">Nenhuma candidatura registada até ao momento.</td></tr>';
+                return;
+            }
+
+            inscricoes.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                
+                const estadoClass = item.estado_candidatura === 'Aceite' ? 'bg-emerald-100 text-emerald-800' :
+                                    item.estado_candidatura === 'Em Espera' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800';
+
+                tr.innerHTML = `
+                    <td class="p-4 font-bold text-navy-900">${item.nome_completo}</td>
+                    <td class="p-4 text-slate-600">${item.email}<br><span class="text-[10px] text-slate-400">${item.telefone || ''}</span></td>
+                    <td class="p-4 font-mono font-bold">${item.matricula}</td>
+                    <td class="p-4 font-semibold text-academic-blue">${item.liga_id}</td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${estadoClass}">${item.estado_candidatura || 'Pendente'}</span></td>
+                    <td class="p-4 text-center space-x-1">
+                        <button onclick="alterarEstado('${item.id}', 'Aceite')" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-bold text-[10px]">Aceitar</button>
+                        <button onclick="alterarEstado('${item.id}', 'Em Espera')" class="px-2.5 py-1 bg-amber-500 text-white rounded-lg hover:bg-amber-600 font-bold text-[10px]">Espera</button>
+                        <button onclick="eliminarInscricao('${item.id}')" class="px-2.5 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold text-[10px]">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function alterarEstado(id, novoEstado) {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/inscricao/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: storedPassword, estado: novoEstado })
+                });
+                if (response.ok) {
+                    carregarInscricoes();
+                } else {
+                    alert('Erro ao atualizar o estado da candidatura.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro de comunicação com o servidor.');
+            }
+        }
+
+        async function eliminarInscricao(id) {
+            if (!confirm('Tem certeza de que pretende eliminar esta candidatura permanentemente?')) return;
+            try {
+                const response = await fetch(`${API_URL}/api/admin/inscricao/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: storedPassword })
+                });
+                if (response.ok) {
+                    carregarInscricoes();
+                } else {
+                    alert('Erro ao eliminar a candidatura.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro de comunicação com o servidor.');
+            }
+        }
+
+        function logoutAdmin() {
+            storedPassword = '';
+            document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('admin-user-info').classList.add('hidden');
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('input-password').value = '';
+        }
+    </script>
+</body>
+</html>

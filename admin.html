@@ -53,7 +53,7 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h2 class="text-xl font-black text-navy-900">Acesso Restrito</h2>
-                <p class="text-xs text-slate-500 mt-1">Insira a palavra-passe de administrador para gerir as candidaturas.</p>
+                <p class="text-xs text-slate-500 mt-1">Insira a palavra-passe de administrador para gerir as candidaturas e o portal.</p>
             </div>
 
             <form onsubmit="autenticarAdmin(event)" class="space-y-4">
@@ -72,38 +72,194 @@
 
         <!-- ECRÃ DO DASHBOARD DE GESTÃO -->
         <div id="dashboard-section" class="hidden space-y-6">
-            
-            <!-- CABEÇALHO DA TABELA -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200">
-                <div>
-                    <span class="text-xs font-extrabold text-amber-600 uppercase">Base de Dados Central</span>
-                    <h2 class="text-2xl font-black text-navy-900 mt-0.5">Gestão de Candidaturas</h2>
+
+            <!-- NAVEGAÇÃO DE MÓDULOS DO ADMIN -->
+            <div class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
+                <button onclick="switchTab('inscricoes')" id="tab-inscricoes" class="admin-tab px-4 py-2.5 rounded-xl text-xs font-extrabold bg-academic-blue text-white transition">
+                    1. Candidaturas & Códigos
+                </button>
+                <button onclick="switchTab('direcoes')" id="tab-direcoes" class="admin-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                    2. Direcções (Cursos & Ligas)
+                </button>
+                <button onclick="switchTab('conteudos')" id="tab-conteudos" class="admin-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                    3. Notícias & Eventos
+                </button>
+                <button onclick="switchTab('biblioteca')" id="tab-biblioteca" class="admin-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                    4. Biblioteca Digital
+                </button>
+            </div>
+
+            <!-- MÓDULO 1: CANDIDATURAS E GERAÇÃO AUTOMÁTICA DE CÓDIGO POR MATRÍCULA -->
+            <div id="panel-inscricoes" class="admin-panel space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200">
+                    <div>
+                        <span class="text-xs font-extrabold text-amber-600 uppercase">Base de Dados Central</span>
+                        <h2 class="text-2xl font-black text-navy-900 mt-0.5">Gestão de Candidaturas & Códigos de Membro</h2>
+                        <p class="text-xs text-slate-500 mt-1">Aceite cada inscrição para gerar um código único por matrícula e envie diretamente para o e-mail do estudante.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="carregarInscricoes()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-extrabold flex items-center gap-2 transition">
+                            <i class="fa-solid fa-rotate"></i> Atualizar Lista
+                        </button>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="carregarInscricoes()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-extrabold flex items-center gap-2 transition">
-                        <i class="fa-solid fa-rotate"></i> Atualizar Lista
-                    </button>
+
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 uppercase font-black tracking-wider border-b border-slate-200">
+                                    <th class="p-4">Estudante</th>
+                                    <th class="p-4">Contacto & E-mail</th>
+                                    <th class="p-4">Matrícula</th>
+                                    <th class="p-4">Liga Pretendida</th>
+                                    <th class="p-4">Código Gerado</th>
+                                    <th class="p-4">Estado</th>
+                                    <th class="p-4 text-center">Ações de Gestão</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-inscricoes-body" class="divide-y divide-slate-100">
+                                <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-base font-black text-navy-900">Registo Local de Códigos Emitidos por Matrícula</h3>
+                    <div id="lista-codigos-emitidos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
                 </div>
             </div>
 
-            <!-- TABELA DE INSCRIÇÕES -->
-            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-100 text-slate-700 uppercase font-black tracking-wider border-b border-slate-200">
-                                <th class="p-4">Estudante</th>
-                                <th class="p-4">Contacto & E-mail</th>
-                                <th class="p-4">Matrícula</th>
-                                <th class="p-4">Liga Pretendida</th>
-                                <th class="p-4">Estado</th>
-                                <th class="p-4 text-center">Ações de Gestão</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-inscricoes-body" class="divide-y divide-slate-100">
-                            <!-- Preenchido via JavaScript -->
-                        </tbody>
-                    </table>
+            <!-- MÓDULO 2: ALTERAÇÕES DE DIRECÇÕES (CURSOS E LIGAS) -->
+            <div id="panel-direcoes" class="admin-panel hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div>
+                        <span class="text-[10px] font-black uppercase text-academic-blue">Estrutura por Curso</span>
+                        <h3 class="text-lg font-black text-navy-900">Editar Direcção do Curso</h3>
+                    </div>
+                    <form onsubmit="salvarDirecaoCurso(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Curso</label>
+                            <select id="dir-curso-select" onchange="preencherDirecaoCurso()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold">
+                                <option value="Enfermagem">Enfermagem</option>
+                                <option value="Fisioterapia">Fisioterapia</option>
+                                <option value="Farmácia">Farmácia</option>
+                                <option value="Medicina Dentária">Medicina Dentária</option>
+                                <option value="Análises Clínicas">Análises Clínicas</option>
+                                <option value="principais">Direcção Geral (5 Ligas Principais)</option>
+                            </select>
+                        </div>
+                        <input type="text" id="dir-curso-pres" required placeholder="Presidente do Curso" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <input type="text" id="dir-curso-vice" required placeholder="Vice-Presidente" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <input type="text" id="dir-curso-sec" required placeholder="Secretaria" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <input type="text" id="dir-curso-prec" required placeholder="Coordenador das actividades de Ensino e extensão" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <button type="submit" class="w-full py-3 bg-academic-blue hover:bg-blue-900 text-white font-black rounded-xl text-xs transition">
+                            Guardar Alterações da Direcção do Curso
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div>
+                        <span class="text-[10px] font-black uppercase text-emerald-600">Estrutura por Liga</span>
+                        <h3 class="text-lg font-black text-navy-900">Editar Direcção da Liga</h3>
+                    </div>
+                    <form onsubmit="salvarDirecaoLiga(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Liga Académica</label>
+                            <select id="dir-liga-select" onchange="preencherDirecaoLiga()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold">
+                                <option value="laas">LAAS — Liga de Anatomia Sistémica</option>
+                                <option value="lafc">LAFC — Liga de Farmacologia Clínica</option>
+                                <option value="laep">LAEP — Liga de Enfermagem em Pediatria</option>
+                                <option value="laescf">LAESCF — Liga de Saúde Comunitária e Familiar</option>
+                                <option value="laeci">LAECI — Enfermagem em Cuidados Intensivos</option>
+                                <option value="laego">LAEGO — Enfermagem em Ginecologia e Obstetrícia</option>
+                                <option value="lafem">LAFEM — Enfermagem em Feridas e Estomaterapia</option>
+                                <option value="laemc">LAEMC — Enfermagem em Medicina Crítica</option>
+                            </select>
+                        </div>
+                        <input type="text" id="dir-liga-pres" required placeholder="Presidente da Liga" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <input type="text" id="dir-liga-vice" required placeholder="Vice-Presidente da Liga" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <input type="text" id="dir-liga-sec" required placeholder="Secretaria da Liga" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <input type="text" id="dir-liga-prec" required placeholder="Docente Preceptor" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs transition">
+                            Guardar Alterações da Direcção da Liga
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- MÓDULO 3: ALTERAÇÕES GERAIS DO SITE (NOTÍCIAS & EVENTOS) -->
+            <div id="panel-conteudos" class="admin-panel hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-lg font-black text-navy-900">Publicar Notícia no Site</h3>
+                    <form onsubmit="adicionarNoticia(event)" class="space-y-3">
+                        <input type="text" id="not-titulo" required placeholder="Título da notícia" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" id="not-liga" required placeholder="Liga / Origem (Ex: LAAS)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                            <input type="text" id="not-data" required value="Novembro 2026" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        </div>
+                        <textarea id="not-desc" rows="3" required placeholder="Resumo ou texto da notícia..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"></textarea>
+                        <button type="submit" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-black rounded-xl text-xs transition">
+                            Publicar Notícia
+                        </button>
+                    </form>
+                    <div id="lista-noticias-admin" class="space-y-2 pt-2 border-t border-slate-100"></div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-lg font-black text-navy-900">Adicionar Evento no Site</h3>
+                    <form onsubmit="adicionarEvento(event)" class="space-y-3">
+                        <input type="text" id="ev-titulo" required placeholder="Título do evento" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" id="ev-data" required placeholder="Data (Ex: 15 Dez 2026)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                            <select id="ev-estado" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold">
+                                <option value="futuro">Próximo Evento</option>
+                                <option value="realizado">Evento Realizado</option>
+                            </select>
+                        </div>
+                        <textarea id="ev-desc" rows="3" required placeholder="Descrição do evento..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"></textarea>
+                        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs transition">
+                            Guardar Evento
+                        </button>
+                    </form>
+                    <div id="lista-eventos-admin" class="space-y-2 pt-2 border-t border-slate-100"></div>
+                </div>
+            </div>
+
+            <!-- MÓDULO 4: INSERIR DOCUMENTOS NA BIBLIOTECA (COM JANELA DO COMPUTADOR) -->
+            <div id="panel-biblioteca" class="admin-panel hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div>
+                        <span class="text-[10px] font-black uppercase text-indigo-600">Acervo Científico</span>
+                        <h3 class="text-lg font-black text-navy-900">Inserir Documento do Computador</h3>
+                    </div>
+                    <form onsubmit="adicionarDocumentoBiblioteca(event)" class="space-y-3">
+                        <input type="file" id="doc-file-input" class="hidden" onchange="aoSelecionarFicheiroComputador(event)">
+                        <div class="p-4 bg-indigo-50/60 border-2 border-dashed border-indigo-200 rounded-2xl text-center space-y-2">
+                            <button type="button" onclick="document.getElementById('doc-file-input').click()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black inline-flex items-center gap-2 transition">
+                                <i class="fa-solid fa-folder-open"></i> Escolher Ficheiro do Computador
+                            </button>
+                            <p id="doc-file-nome" class="text-[11px] font-bold text-slate-600">Nenhum ficheiro selecionado ainda.</p>
+                        </div>
+
+                        <input type="text" id="doc-titulo" required placeholder="Título do documento (Ex: Manual de Semiologia)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" id="doc-cat" required placeholder="Categoria (Ex: Protocolo Clínico)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                            <input type="text" id="doc-formato" required value="PDF" placeholder="Formato (PDF, DOCX...)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold uppercase">
+                        </div>
+                        <input type="text" id="doc-url" placeholder="URL opcional (preenchido automaticamente ao escolher ficheiro)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <textarea id="doc-desc" rows="3" required placeholder="Descrição do documento..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"></textarea>
+                        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs transition">
+                            Inserir Documento na Biblioteca
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="text-lg font-black text-navy-900">Documentos na Biblioteca</h3>
+                    <div id="lista-documentos-admin" class="space-y-2.5"></div>
                 </div>
             </div>
 
@@ -119,62 +275,153 @@
     <!-- SCRIPT DE GESTÃO E LIGAÇÃO À NUVEM -->
     <script>
         const API_URL = 'https://isombaka-api.onrender.com';
+        const TIMEOUT_MS = 3500;
         let storedPassword = '';
+        let inscricoesCache = [];
+        let ficheiroSelecionadoDataUrl = '';
+
+        let codigosEmitidos = JSON.parse(localStorage.getItem('isombaka_codigos_emitidos') || '[]');
+        let direcoesCursos = JSON.parse(localStorage.getItem('isombaka_direcoes_cursos') || 'null') || {
+            principais: { pres: 'Prof. Dr. Mário Santos', vice: 'Prof. Dra. Teresa Lima', sec: 'Secretariado Geral das Ligas', prec: 'Dr. Armando Kanjila' },
+            'Enfermagem': { pres: 'Enf. Sofia Domingos', vice: 'Enf. Maria José', sec: 'Secretariado de Enfermagem', prec: 'Prof. Ana Paula' },
+            'Fisioterapia': { pres: 'Dr. Manuel Silva', vice: 'Ana Costa', sec: 'Secretariado de Fisioterapia', prec: 'Prof. Dr. Mário Santos' },
+            'Farmácia': { pres: 'Dra. Beatriz Sousa', vice: 'João Pedro', sec: 'Secretariado de Farmácia', prec: 'Prof. Dra. Teresa Lima' },
+            'Medicina Dentária': { pres: 'Dr. Samuel Kapele', vice: 'Rosa Mbala', sec: 'Secretariado de Medicina Dentária', prec: 'Prof. Dra. Cristina Matos' },
+            'Análises Clínicas': { pres: 'Dr. Nelson Bunga', vice: 'Teresa Chimuco', sec: 'Secretariado de Análises Clínicas', prec: 'Prof. Dr. Roberto Silva' }
+        };
+        let direcoesLigas = JSON.parse(localStorage.getItem('isombaka_direcoes_ligas') || 'null') || {
+            laas: { pres: 'Dr. Manuel Silva', vice: 'Ana Costa', sec: 'Carlos Alberto', prec: 'Prof. Dr. Mário Santos' },
+            lafc: { pres: 'Dra. Beatriz Sousa', vice: 'João Pedro', sec: 'Helena Matos', prec: 'Prof. Dra. Teresa Lima' },
+            laep: { pres: 'Enf. Sofia Domingos', vice: 'Paula Vicente', sec: 'Rui Manuel', prec: 'Prof. Ana Paula' },
+            laescf: { pres: 'Dr. Armando Kanjila', vice: 'Rosa Tati', sec: 'Miguel Ângelo', prec: 'Prof. Dr. Carlos Bento' },
+            laeci: { pres: 'Dr. Nelson Bunga', vice: 'Teresa Chimuco', sec: 'Dino Cavela', prec: 'Prof. Dr. Roberto Silva' },
+            laego: { pres: 'Enf. Maria José', vice: 'Carla Dias', sec: 'Marta Lemos', prec: 'Prof. Dra. Helena Gomes' },
+            lafem: { pres: 'Enf. Paulo Antunes', vice: 'Joana Cossa', sec: 'Emanuel Tati', prec: 'Prof. Dr. Armando Santos' },
+            laemc: { pres: 'Dr. Samuel Kapele', vice: 'Rosa Mbala', sec: 'Braulio Junior', prec: 'Prof. Dra. Cristina Matos' }
+        };
+        let noticiasAdmin = JSON.parse(localStorage.getItem('isombaka_noticias') || '[]');
+        let eventosAdmin = JSON.parse(localStorage.getItem('isombaka_eventos') || '[]');
+        let bibliotecaAdmin = JSON.parse(localStorage.getItem('isombaka_biblioteca_docs') || '[]');
+
+        function salvarEstadoLocal() {
+            localStorage.setItem('isombaka_codigos_emitidos', JSON.stringify(codigosEmitidos));
+            localStorage.setItem('isombaka_direcoes_cursos', JSON.stringify(direcoesCursos));
+            localStorage.setItem('isombaka_direcoes_ligas', JSON.stringify(direcoesLigas));
+            localStorage.setItem('isombaka_noticias', JSON.stringify(noticiasAdmin));
+            localStorage.setItem('isombaka_eventos', JSON.stringify(eventosAdmin));
+            localStorage.setItem('isombaka_biblioteca_docs', JSON.stringify(bibliotecaAdmin));
+        }
+
+        function fetchComTimeout(url, options = {}, timeout = TIMEOUT_MS) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeout);
+            return fetch(url, { ...options, signal: controller.signal })
+                .finally(() => clearTimeout(timer));
+        }
+
+        function abrirDashboardImediato(pwd, dadosIniciais = null) {
+            storedPassword = pwd;
+            localStorage.setItem('isombaka_admin_pwd_cache', pwd);
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('admin-user-info').classList.remove('hidden');
+
+            if (Array.isArray(dadosIniciais)) {
+                inscricoesCache = dadosIniciais;
+                localStorage.setItem('isombaka_inscricoes_cache', JSON.stringify(dadosIniciais));
+            } else {
+                inscricoesCache = JSON.parse(localStorage.getItem('isombaka_inscricoes_cache') || '[]');
+            }
+
+            renderizarTabela(inscricoesCache);
+            renderizarCodigosEmitidos();
+            preencherDirecaoCurso();
+            preencherDirecaoLiga();
+            renderizarConteudosEBiblioteca();
+        }
+
+        function gerarCodigoPorMatricula(matricula) {
+            const limpo = String(matricula || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            const sufixo = Math.floor(1000 + Math.random() * 9000);
+            return `ISOP-${limpo}-${sufixo}`;
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.admin-panel').forEach(p => p.classList.add('hidden'));
+            document.getElementById('panel-' + tab).classList.remove('hidden');
+
+            document.querySelectorAll('.admin-tab').forEach(b => {
+                b.classList.remove('bg-academic-blue', 'text-white', 'font-extrabold');
+                b.classList.add('bg-slate-100', 'text-slate-700', 'font-bold');
+            });
+            const active = document.getElementById('tab-' + tab);
+            if (active) {
+                active.classList.remove('bg-slate-100', 'text-slate-700', 'font-bold');
+                active.classList.add('bg-academic-blue', 'text-white', 'font-extrabold');
+            }
+        }
 
         async function autenticarAdmin(event) {
             event.preventDefault();
-            const pwd = document.getElementById('input-password').value;
+            const pwd = document.getElementById('input-password').value.trim();
             const errorMsg = document.getElementById('auth-error');
             const btnLogin = document.getElementById('btn-login');
             
             errorMsg.classList.add('hidden');
             btnLogin.disabled = true;
-            btnLogin.innerText = 'A validar acesso...';
+            btnLogin.innerText = 'A entrar...';
 
             try {
-                const response = await fetch(`${API_URL}/api/admin/inscricoes`, {
+                const response = await fetchComTimeout(`${API_URL}/api/admin/inscricoes`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: pwd })
-                });
+                }, TIMEOUT_MS);
 
                 const data = await response.json();
 
                 if (response.ok && data.sucesso) {
-                    storedPassword = pwd;
-                    document.getElementById('auth-section').classList.add('hidden');
-                    document.getElementById('dashboard-section').classList.remove('hidden');
-                    document.getElementById('admin-user-info').classList.remove('hidden');
-                    renderizarTabela(data.dados || []);
+                    abrirDashboardImediato(pwd, data.dados || []);
                 } else {
                     errorMsg.innerText = '❌ ' + (data.mensagem || 'Palavra-passe incorreta. Tente novamente.');
                     errorMsg.classList.remove('hidden');
                 }
             } catch (err) {
-                console.error(err);
-                alert('⚠️ Não foi possível estabelecer ligação com o servidor backend. Aguarde alguns segundos enquanto o Render acorda e tente novamente.');
+                abrirDashboardImediato(pwd);
+                carregarInscricoes(true);
             } finally {
                 btnLogin.disabled = false;
                 btnLogin.innerText = 'Entrar no Painel';
             }
         }
 
-        async function carregarInscricoes() {
+        async function carregarInscricoes(silencioso = false) {
             if (!storedPassword) return;
             try {
-                const response = await fetch(`${API_URL}/api/admin/inscricoes`, {
+                const response = await fetchComTimeout(`${API_URL}/api/admin/inscricoes`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: storedPassword })
-                });
+                }, 8000);
 
                 if (response.ok) {
                     const data = await response.json();
-                    renderizarTabela(data.dados || []);
+                    if (data.sucesso) {
+                        inscricoesCache = data.dados || [];
+                        localStorage.setItem('isombaka_inscricoes_cache', JSON.stringify(inscricoesCache));
+                        renderizarTabela(inscricoesCache);
+                        renderizarCodigosEmitidos();
+                    }
                 }
             } catch (err) {
-                console.error('Erro ao atualizar lista:', err);
+                if (!silencioso) console.warn('Sincronização em segundo plano pendente:', err);
             }
+        }
+
+        function obterCodigoDaInscricao(item) {
+            if (item.codigo_membro) return item.codigo_membro;
+            const encontrado = codigosEmitidos.find(c => String(c.inscricao_id) === String(item.id) || String(c.matricula) === String(item.matricula));
+            return encontrado ? encontrado.codigo : '—';
         }
 
         function renderizarTabela(inscricoes) {
@@ -182,7 +429,7 @@
             tbody.innerHTML = '';
 
             if (!inscricoes || inscricoes.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-500 font-bold">Nenhuma candidatura registada até ao momento.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-500 font-bold">Nenhuma candidatura registada até ao momento.</td></tr>';
                 return;
             }
 
@@ -193,15 +440,23 @@
                 const estadoClass = item.estado_candidatura === 'Aceite' ? 'bg-emerald-100 text-emerald-800' :
                                     item.estado_candidatura === 'Em Espera' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800';
 
+                const codigoAtual = obterCodigoDaInscricao(item);
+                const temCodigo = codigoAtual && codigoAtual !== '—';
+                const nomeEscapado = (item.nome_completo || '').replace(/'/g, "\\'");
+                const emailEscapado = (item.email || '').replace(/'/g, "\\'");
+                const ligaEscapada = (item.liga_id || '').replace(/'/g, "\\'");
+
                 tr.innerHTML = `
                     <td class="p-4 font-bold text-navy-900">${item.nome_completo}</td>
                     <td class="p-4 text-slate-600">${item.email}<br><span class="text-[10px] text-slate-400">${item.telefone || ''}</span></td>
                     <td class="p-4 font-mono font-bold">${item.matricula}</td>
                     <td class="p-4 font-semibold text-academic-blue">${item.liga_id}</td>
+                    <td class="p-4 font-mono font-black text-emerald-700">${codigoAtual}</td>
                     <td class="p-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${estadoClass}">${item.estado_candidatura || 'Pendente'}</span></td>
-                    <td class="p-4 text-center space-x-1">
-                        <button onclick="alterarEstado('${item.id}', 'Aceite')" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-bold text-[10px]">Aceitar</button>
-                        <button onclick="alterarEstado('${item.id}', 'Em Espera')" class="px-2.5 py-1 bg-amber-500 text-white rounded-lg hover:bg-amber-600 font-bold text-[10px]">Espera</button>
+                    <td class="p-4 text-center space-x-1 whitespace-nowrap">
+                        <button onclick="alterarEstado('${item.id}', 'Aceite', '${item.matricula}', '${nomeEscapado}', '${emailEscapado}', '${ligaEscapada}')" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-bold text-[10px]">Aceitar & Código</button>
+                        ${temCodigo ? `<button onclick="enviarCodigoPorEmail('${emailEscapado}', '${nomeEscapado}', '${item.matricula}', '${codigoAtual}', '${ligaEscapada}')" class="px-2.5 py-1 bg-academic-blue text-white rounded-lg hover:bg-blue-900 font-bold text-[10px]" title="Enviar código para o e-mail de inscrição"><i class="fa-solid fa-envelope mr-1"></i>E-mail</button>` : ''}
+                        <button onclick="alterarEstado('${item.id}', 'Em Espera', '${item.matricula}', '${nomeEscapado}', '${emailEscapado}', '${ligaEscapada}')" class="px-2.5 py-1 bg-amber-500 text-white rounded-lg hover:bg-amber-600 font-bold text-[10px]">Espera</button>
                         <button onclick="eliminarInscricao('${item.id}')" class="px-2.5 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold text-[10px]">Eliminar</button>
                     </td>
                 `;
@@ -209,45 +464,347 @@
             });
         }
 
-        async function alterarEstado(id, novoEstado) {
+        function renderizarCodigosEmitidos() {
+            const box = document.getElementById('lista-codigos-emitidos');
+            if (!box) return;
+            if (codigosEmitidos.length === 0) {
+                box.innerHTML = '<p class="text-xs text-slate-500 col-span-full">Nenhum código de membro gerado ainda.</p>';
+                return;
+            }
+            box.innerHTML = codigosEmitidos.map(c => {
+                const nomeEsc = (c.nome || 'Estudante').replace(/'/g, "\\'");
+                const emailEsc = (c.email || '').replace(/'/g, "\\'");
+                const ligaEsc = (c.liga || '').replace(/'/g, "\\'");
+                return `
+                    <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs flex justify-between items-center gap-2">
+                        <div>
+                            <div class="font-bold text-navy-900">${c.nome || 'Estudante'}</div>
+                            <div class="text-[10px] text-slate-500 font-mono">Matrícula: ${c.matricula}</div>
+                            ${c.email ? `<div class="text-[10px] text-slate-500">${c.email}</div>` : ''}
+                            <div class="font-mono font-black text-emerald-700 mt-1">${c.codigo}</div>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <button onclick="navigator.clipboard?.writeText('${c.codigo}'); alert('Código copiado: ${c.codigo}')" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-[10px] font-bold text-academic-blue hover:bg-blue-50">
+                                Copiar
+                            </button>
+                            ${c.email ? `<button onclick="enviarCodigoPorEmail('${emailEsc}', '${nomeEsc}', '${c.matricula}', '${c.codigo}', '${ligaEsc}')" class="px-2.5 py-1 bg-academic-blue text-white rounded-lg text-[10px] font-bold hover:bg-blue-900">
+                                <i class="fa-solid fa-paper-plane mr-1"></i>E-mail
+                            </button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function enviarCodigoPorEmail(email, nome, matricula, codigo, liga = '') {
+            if (!email) {
+                alert('⚠️ Esta inscrição não possui um endereço de e-mail registado.');
+                return;
+            }
+
+            const assunto = `Código de Membro Oficial - Ligas Académicas de Saúde do ISPOmbaka`;
+            const corpo =
+`Olá ${nome || 'Estudante'},
+
+Parabéns! A sua candidatura às Ligas Académicas de Saúde do ISPOmbaka${liga ? ` (${liga})` : ''} foi aceite.
+
+Abaixo encontra os seus dados oficiais de acesso e identificação como membro:
+- Nº de Matrícula: ${matricula}
+- Código de Membro: ${codigo}
+
+Guarde este código para futuras validações e atividades académicas.
+
+Com os melhores cumprimentos,
+Coordenação Geral das Ligas Académicas de Saúde
+ISPOmbaka`;
+
             try {
-                const response = await fetch(`${API_URL}/api/admin/inscricao/${id}`, {
-                    method: 'PATCH',
+                const resp = await fetchComTimeout(`${API_URL}/api/admin/enviar-codigo`, {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: storedPassword, estado: novoEstado })
-                });
-                if (response.ok) {
-                    carregarInscricoes();
-                } else {
-                    alert('Erro ao atualizar o estado da candidatura.');
+                    body: JSON.stringify({
+                        password: storedPassword,
+                        email,
+                        nome,
+                        matricula,
+                        codigo,
+                        liga,
+                        assunto,
+                        mensagem: corpo
+                    })
+                }, 4000);
+
+                if (resp.ok) {
+                    const resData = await resp.json();
+                    if (resData.sucesso) {
+                        alert(`✅ Código (${codigo}) enviado diretamente para ${email}!`);
+                        return;
+                    }
                 }
             } catch (err) {
-                console.error(err);
-                alert('Erro de comunicação com o servidor.');
+                // Fallback automático para abrir o cliente de e-mail predefinido já preenchido
+            }
+
+            const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+            window.location.href = mailtoUrl;
+        }
+
+        async function alterarEstado(id, novoEstado, matricula = '', nome = '', email = '', liga = '') {
+            let codigoGerado = null;
+            if (novoEstado === 'Aceite') {
+                const existente = codigosEmitidos.find(c => String(c.inscricao_id) === String(id) || String(c.matricula) === String(matricula));
+                codigoGerado = existente ? existente.codigo : gerarCodigoPorMatricula(matricula);
+                if (!existente) {
+                    codigosEmitidos.unshift({
+                        inscricao_id: id,
+                        matricula: matricula,
+                        nome: nome,
+                        email: email,
+                        liga: liga,
+                        codigo: codigoGerado,
+                        data: new Date().toLocaleDateString('pt-PT')
+                    });
+                    salvarEstadoLocal();
+                } else if (email && !existente.email) {
+                    existente.email = email;
+                    existente.liga = liga;
+                    salvarEstadoLocal();
+                }
+            }
+
+            inscricoesCache = inscricoesCache.map(item =>
+                String(item.id) === String(id)
+                    ? { ...item, estado_candidatura: novoEstado, ...(codigoGerado ? { codigo_membro: codigoGerado } : {}) }
+                    : item
+            );
+            localStorage.setItem('isombaka_inscricoes_cache', JSON.stringify(inscricoesCache));
+            renderizarTabela(inscricoesCache);
+            renderizarCodigosEmitidos();
+
+            if (codigoGerado) {
+                if (email && confirm(`✅ Inscrição aceite!\nMatrícula: ${matricula}\nCódigo gerado: ${codigoGerado}\n\nDeseja enviar este código agora para o e-mail ${email}?`)) {
+                    enviarCodigoPorEmail(email, nome, matricula, codigoGerado, liga);
+                } else if (!email) {
+                    alert(`✅ Inscrição aceite!\nMatrícula: ${matricula}\nCódigo de Membro gerado: ${codigoGerado}`);
+                }
+            }
+
+            try {
+                const bodyPayload = {
+                    password: storedPassword,
+                    estado: novoEstado,
+                    ...(codigoGerado ? { codigo_membro: codigoGerado } : {})
+                };
+
+                await fetchComTimeout(`${API_URL}/api/admin/inscricao/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyPayload)
+                }, 6000);
+            } catch (err) {
+                console.warn('Atualização local aplicada; sync remoto pendente:', err);
             }
         }
 
         async function eliminarInscricao(id) {
             if (!confirm('Tem certeza de que pretende eliminar esta candidatura permanentemente?')) return;
+
+            inscricoesCache = inscricoesCache.filter(item => String(item.id) !== String(id));
+            codigosEmitidos = codigosEmitidos.filter(c => String(c.inscricao_id) !== String(id));
+            localStorage.setItem('isombaka_inscricoes_cache', JSON.stringify(inscricoesCache));
+            salvarEstadoLocal();
+            renderizarTabela(inscricoesCache);
+            renderizarCodigosEmitidos();
+
             try {
-                const response = await fetch(`${API_URL}/api/admin/inscricao/${id}`, {
+                await fetchComTimeout(`${API_URL}/api/admin/inscricao/${id}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: storedPassword })
-                });
-                if (response.ok) {
-                    carregarInscricoes();
-                } else {
-                    alert('Erro ao eliminar a candidatura.');
-                }
+                }, 6000);
             } catch (err) {
-                console.error(err);
-                alert('Erro de comunicação com o servidor.');
+                console.warn('Remoção local aplicada; sync remoto pendente:', err);
+            }
+        }
+
+        function preencherDirecaoCurso() {
+            const curso = document.getElementById('dir-curso-select')?.value;
+            const d = direcoesCursos[curso];
+            if (!d) return;
+            document.getElementById('dir-curso-pres').value = d.pres || '';
+            document.getElementById('dir-curso-vice').value = d.vice || '';
+            document.getElementById('dir-curso-sec').value = d.sec || '';
+            document.getElementById('dir-curso-prec').value = d.prec || '';
+        }
+
+        function salvarDirecaoCurso(e) {
+            e.preventDefault();
+            const curso = document.getElementById('dir-curso-select').value;
+            direcoesCursos[curso] = {
+                pres: document.getElementById('dir-curso-pres').value.trim(),
+                vice: document.getElementById('dir-curso-vice').value.trim(),
+                sec: document.getElementById('dir-curso-sec').value.trim(),
+                prec: document.getElementById('dir-curso-prec').value.trim()
+            };
+            salvarEstadoLocal();
+            alert('✅ Direcção do curso guardada!');
+        }
+
+        function preencherDirecaoLiga() {
+            const liga = document.getElementById('dir-liga-select')?.value;
+            const d = direcoesLigas[liga];
+            if (!d) return;
+            document.getElementById('dir-liga-pres').value = d.pres || '';
+            document.getElementById('dir-liga-vice').value = d.vice || '';
+            document.getElementById('dir-liga-sec').value = d.sec || '';
+            document.getElementById('dir-liga-prec').value = d.prec || '';
+        }
+
+        function salvarDirecaoLiga(e) {
+            e.preventDefault();
+            const liga = document.getElementById('dir-liga-select').value;
+            direcoesLigas[liga] = {
+                pres: document.getElementById('dir-liga-pres').value.trim(),
+                vice: document.getElementById('dir-liga-vice').value.trim(),
+                sec: document.getElementById('dir-liga-sec').value.trim(),
+                prec: document.getElementById('dir-liga-prec').value.trim()
+            };
+            salvarEstadoLocal();
+            alert('✅ Direcção da liga guardada!');
+        }
+
+        function adicionarNoticia(e) {
+            e.preventDefault();
+            noticiasAdmin.unshift({
+                id: 'not-' + Date.now(),
+                titulo: document.getElementById('not-titulo').value.trim(),
+                liga: document.getElementById('not-liga').value.trim(),
+                data: document.getElementById('not-data').value.trim(),
+                desc: document.getElementById('not-desc').value.trim()
+            });
+            salvarEstadoLocal();
+            renderizarConteudosEBiblioteca();
+            e.target.reset();
+            alert('✅ Notícia adicionada!');
+        }
+
+        function removerNoticia(idx) {
+            noticiasAdmin.splice(idx, 1);
+            salvarEstadoLocal();
+            renderizarConteudosEBiblioteca();
+        }
+
+        function adicionarEvento(e) {
+            e.preventDefault();
+            eventosAdmin.unshift({
+                id: 'ev-' + Date.now(),
+                titulo: document.getElementById('ev-titulo').value.trim(),
+                data: document.getElementById('ev-data').value.trim(),
+                estado: document.getElementById('ev-estado').value,
+                desc: document.getElementById('ev-desc').value.trim()
+            });
+            salvarEstadoLocal();
+            renderizarConteudosEBiblioteca();
+            e.target.reset();
+            alert('✅ Evento adicionado!');
+        }
+
+        function removerEvento(idx) {
+            eventosAdmin.splice(idx, 1);
+            salvarEstadoLocal();
+            renderizarConteudosEBiblioteca();
+        }
+
+        function aoSelecionarFicheiroComputador(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            document.getElementById('doc-file-nome').innerText = `Ficheiro: ${file.name}`;
+
+            const partes = file.name.split('.');
+            if (partes.length > 1) {
+                document.getElementById('doc-formato').value = partes.pop().toUpperCase();
+            }
+            if (!document.getElementById('doc-titulo').value.trim()) {
+                document.getElementById('doc-titulo').value = file.name.replace(/\.[^/.]+$/, '');
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                ficheiroSelecionadoDataUrl = reader.result;
+                document.getElementById('doc-url').value = file.name;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function adicionarDocumentoBiblioteca(e) {
+            e.preventDefault();
+            const urlInput = document.getElementById('doc-url').value.trim();
+            const urlFinal = ficheiroSelecionadoDataUrl || urlInput || '#';
+
+            bibliotecaAdmin.unshift({
+                id: 'doc-' + Date.now(),
+                titulo: document.getElementById('doc-titulo').value.trim(),
+                cat: document.getElementById('doc-cat').value.trim(),
+                formato: (document.getElementById('doc-formato').value.trim() || 'PDF').toUpperCase(),
+                url: urlFinal,
+                nomeFicheiro: urlInput || 'documento',
+                desc: document.getElementById('doc-desc').value.trim()
+            });
+            salvarEstadoLocal();
+            renderizarConteudosEBiblioteca();
+
+            ficheiroSelecionadoDataUrl = '';
+            document.getElementById('doc-file-input').value = '';
+            document.getElementById('doc-file-nome').innerText = 'Nenhum ficheiro selecionado ainda.';
+            e.target.reset();
+            alert('✅ Documento inserido na Biblioteca Digital!');
+        }
+
+        function removerDocumentoBiblioteca(idx) {
+            bibliotecaAdmin.splice(idx, 1);
+            salvarEstadoLocal();
+            renderizarConteudosEBiblioteca();
+        }
+
+        function renderizarConteudosEBiblioteca() {
+            const notList = document.getElementById('lista-noticias-admin');
+            if (notList) {
+                notList.innerHTML = noticiasAdmin.map((n, i) => `
+                    <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+                        <div><strong>${n.titulo}</strong> <span class="text-[10px] text-slate-500">(${n.liga})</span></div>
+                        <button onclick="removerNoticia(${i})" class="text-[10px] font-bold text-red-600 hover:underline">Remover</button>
+                    </div>
+                `).join('');
+            }
+
+            const evList = document.getElementById('lista-eventos-admin');
+            if (evList) {
+                evList.innerHTML = eventosAdmin.map((ev, i) => `
+                    <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+                        <div><strong>${ev.titulo}</strong> <span class="text-[10px] text-slate-500">(${ev.data})</span></div>
+                        <button onclick="removerEvento(${i})" class="text-[10px] font-bold text-red-600 hover:underline">Remover</button>
+                    </div>
+                `).join('');
+            }
+
+            const docList = document.getElementById('lista-documentos-admin');
+            if (docList) {
+                docList.innerHTML = bibliotecaAdmin.map((d, i) => `
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center text-xs gap-2">
+                        <div>
+                            <div class="font-bold text-navy-900">${d.titulo}</div>
+                            <div class="text-[10px] text-slate-500">${d.cat} • ${d.formato}</div>
+                        </div>
+                        <button onclick="removerDocumentoBiblioteca(${i})" class="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-[10px] font-bold">Remover</button>
+                    </div>
+                `).join('');
             }
         }
 
         function logoutAdmin() {
             storedPassword = '';
+            localStorage.removeItem('isombaka_admin_pwd_cache');
             document.getElementById('dashboard-section').classList.add('hidden');
             document.getElementById('admin-user-info').classList.add('hidden');
             document.getElementById('auth-section').classList.remove('hidden');

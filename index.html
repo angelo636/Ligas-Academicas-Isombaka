@@ -1262,6 +1262,121 @@
             navigateTo('home');
         }
 
+        const docsPadraoBiblioteca = [
+            {
+                id: 'doc-estatuto',
+                cat: 'Regulamento & Diretrizes',
+                titulo: 'Estatuto Geral das Ligas Académicas 2026',
+                formato: 'PDF',
+                desc: 'Normas de funcionamento, certificação e ética científica na Isombaka.',
+                url: '#'
+            },
+            {
+                id: 'doc-sav',
+                cat: 'Protocolo Clínico',
+                titulo: 'Manual de Suporte Avançado de Vida e Urgência',
+                formato: 'PDF',
+                desc: 'Guia técnico preparado pelas ligas LAECI e LAEMC.',
+                url: '#'
+            },
+            {
+                id: 'doc-ic',
+                cat: 'Investigação',
+                titulo: 'Modelo Oficial de Projeto de Iniciação Científica',
+                formato: 'DOCX',
+                desc: 'Template institucional para submissão de trabalhos nas jornadas.',
+                url: '#'
+            }
+        ];
+
+        function obterDocumentosBiblioteca() {
+            const locais = JSON.parse(localStorage.getItem('isombaka_biblioteca_docs') || '[]');
+            return locais.length > 0 ? locais : docsPadraoBiblioteca;
+        }
+
+        function abrirDocumentoBiblioteca(index) {
+            const docs = obterDocumentosBiblioteca();
+            const doc = docs[index];
+            if (!doc) return;
+
+            if (!doc.url || doc.url === '#') {
+                alert(`📄 ${doc.titulo}\n\n${doc.desc}\n\nEste documento ainda não tem ficheiro anexado. Envie um ficheiro pelo Painel Admin na aba Biblioteca Digital.`);
+                return;
+            }
+
+            if (doc.url.startsWith('data:')) {
+                const partes = doc.url.split(',');
+                const mimeMatch = partes[0].match(/:(.*?);/);
+                const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+                const byteString = atob(partes[1]);
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                const blob = new Blob([ab], { type: mime });
+                const blobUrl = URL.createObjectURL(blob);
+
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                const ext = (doc.formato || 'bin').toLowerCase();
+                link.download = (doc.nomeFicheiro || doc.titulo || 'documento').replace(/\.[^/.]+$/, '') + '.' + ext;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                return;
+            }
+
+            window.open(doc.url, '_blank', 'noopener,noreferrer');
+        }
+
+        function sincronizarDadosDoAdmin() {
+            const dirCursosSalvos = JSON.parse(localStorage.getItem('isombaka_direcoes_cursos') || 'null');
+            if (dirCursosSalvos) {
+                Object.keys(dirCursosSalvos).forEach(k => {
+                    if (direcoesPorCurso[k]) {
+                        direcoesPorCurso[k] = { ...direcoesPorCurso[k], ...dirCursosSalvos[k] };
+                    }
+                });
+            }
+
+            const dirLigasSalvas = JSON.parse(localStorage.getItem('isombaka_direcoes_ligas') || 'null');
+            if (dirLigasSalvas) {
+                ligasData.forEach(liga => {
+                    if (dirLigasSalvas[liga.id]) {
+                        liga.pres = dirLigasSalvas[liga.id].pres || liga.pres;
+                        liga.vice = dirLigasSalvas[liga.id].vice || liga.vice;
+                        liga.sec = dirLigasSalvas[liga.id].sec || liga.sec;
+                        liga.prec = dirLigasSalvas[liga.id].prec || liga.prec;
+                    }
+                });
+            }
+        }
+
+        async function carregarConteudosRemotos() {
+            try {
+                const resp = await fetch(`${API_URL}/api/conteudos`);
+                if (!resp.ok) return;
+                const json = await resp.json();
+                const d = json?.dados;
+                if (!d) return;
+
+                if (d.direcoesCursos) localStorage.setItem('isombaka_direcoes_cursos', JSON.stringify(d.direcoesCursos));
+                if (d.direcoesLigas) localStorage.setItem('isombaka_direcoes_ligas', JSON.stringify(d.direcoesLigas));
+                if (Array.isArray(d.noticias) && d.noticias.length) localStorage.setItem('isombaka_noticias', JSON.stringify(d.noticias));
+                if (Array.isArray(d.eventos) && d.eventos.length) localStorage.setItem('isombaka_eventos', JSON.stringify(d.eventos));
+                if (Array.isArray(d.biblioteca) && d.biblioteca.length) localStorage.setItem('isombaka_biblioteca_docs', JSON.stringify(d.biblioteca));
+
+                renderAllSections();
+                if (!document.getElementById('view-biblioteca')?.classList.contains('hidden')) {
+                    verificarAcessoBiblioteca();
+                }
+            } catch (err) {
+                console.warn('API /api/conteudos indisponível:', err);
+            }
+        }
+
         async function autenticarMembro(event) {
             event.preventDefault();
             const matricula = document.getElementById('membro-matricula').value.trim();
@@ -1269,12 +1384,30 @@
             const erroDiv = document.getElementById('membro-erro');
             erroDiv.classList.add('hidden');
 
-            if (codigo.startsWith('ISOP') && matricula.length >= 4) {
-                localStorage.setItem('isombaka_membro', JSON.stringify({ matricula, codigo }));
-                document.getElementById('membro-painel').classList.remove('hidden');
-            } else {
+            if (!codigo.startsWith('ISOP') || matricula.length < 4) {
                 erroDiv.classList.remove('hidden');
+                return;
             }
+
+            try {
+                const resp = await fetch(`${API_URL}/api/membro/validar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ matricula, codigo })
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (!data.sucesso) {
+                        erroDiv.classList.remove('hidden');
+                        return;
+                    }
+                }
+            } catch (err) {
+                // Fallback local caso a API esteja a acordar
+            }
+
+            localStorage.setItem('isombaka_membro', JSON.stringify({ matricula, codigo }));
+            document.getElementById('membro-painel').classList.remove('hidden');
         }
 
         function verificarAcessoBiblioteca() {
@@ -1282,26 +1415,22 @@
             if (membro) {
                 document.getElementById('bib-bloqueado').classList.add('hidden');
                 document.getElementById('bib-libertado').classList.remove('hidden');
-                document.getElementById('biblioteca-grid').innerHTML = `
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <span class="text-[10px] font-black uppercase text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded">Regulamento & Diretrizes</span>
-                        <h3 class="font-black text-navy-900 text-base mt-2">Estatuto Geral das Ligas Académicas 2026</h3>
-                        <p class="text-xs text-slate-600 mt-1">Normas de funcionamento, certificação e ética científica na Isombaka.</p>
-                        <a href="#" class="mt-4 inline-block px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-bold">Descarregar PDF</a>
+                const docs = obterDocumentosBiblioteca();
+                document.getElementById('biblioteca-grid').innerHTML = docs.map((doc, idx) => `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[10px] font-black uppercase text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded">${doc.cat || 'Documento'}</span>
+                                <span class="text-[10px] font-black uppercase text-slate-500 bg-slate-100 px-2 py-0.5 rounded">${doc.formato || 'DOC'}</span>
+                            </div>
+                            <h3 class="font-black text-navy-900 text-base mt-2">${doc.titulo}</h3>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">${doc.desc || ''}</p>
+                        </div>
+                        <button type="button" onclick="abrirDocumentoBiblioteca(${idx})" class="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition">
+                            <i class="fa-solid fa-file-arrow-down"></i> Abrir / Descarregar ${doc.formato || 'Ficheiro'}
+                        </button>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <span class="text-[10px] font-black uppercase text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded">Protocolo Clínico</span>
-                        <h3 class="font-black text-navy-900 text-base mt-2">Manual de Suporte Avançado de Vida e Urgência</h3>
-                        <p class="text-xs text-slate-600 mt-1">Guia técnico preparado pelas ligas LAECI e LAEMC.</p>
-                        <a href="#" class="mt-4 inline-block px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-bold">Descarregar PDF</a>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <span class="text-[10px] font-black uppercase text-amber-600 bg-amber-50 px-2.5 py-1 rounded">Investigação</span>
-                        <h3 class="font-black text-navy-900 text-base mt-2">Modelo Oficial de Projeto de Iniciação Científica</h3>
-                        <p class="text-xs text-slate-600 mt-1">Template institucional para submissão de trabalhos nas jornadas.</p>
-                        <a href="#" class="mt-4 inline-block px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-bold">Descarregar DOCX</a>
-                    </div>
-                `;
+                `).join('');
             } else {
                 document.getElementById('bib-bloqueado').classList.remove('hidden');
                 document.getElementById('bib-libertado').classList.add('hidden');
@@ -1309,12 +1438,19 @@
         }
 
         function renderAllSections() {
+            sincronizarDadosDoAdmin();
             renderHomeLigas();
             filtrarLigas();
 
+            const noticiasLocais = JSON.parse(localStorage.getItem('isombaka_noticias') || '[]');
+            const listaNoticias = noticiasLocais.length > 0 ? noticiasLocais : noticiasData;
+
+            const eventosLocais = JSON.parse(localStorage.getItem('isombaka_eventos') || '[]');
+            const listaEventos = eventosLocais.length > 0 ? eventosLocais : eventosData;
+
             const notHome = document.getElementById('home-noticias-summary');
             if (notHome) {
-                notHome.innerHTML = noticiasData.slice(0, 2).map(n => `
+                notHome.innerHTML = listaNoticias.slice(0, 2).map(n => `
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                         <span class="text-[10px] font-black text-amber-600 uppercase">${n.liga}</span>
                         <h4 class="font-extrabold text-navy-900 text-sm mt-1">${n.titulo}</h4>
@@ -1325,7 +1461,7 @@
 
             const notFull = document.getElementById('noticias-full-grid');
             if (notFull) {
-                notFull.innerHTML = noticiasData.map(n => `
+                notFull.innerHTML = listaNoticias.map(n => `
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <span class="text-xs font-bold text-amber-600">${n.liga} • ${n.data}</span>
                         <h3 class="font-extrabold text-navy-900 text-base mt-1">${n.titulo}</h3>
@@ -1336,7 +1472,7 @@
 
             const evHome = document.getElementById('home-eventos-summary');
             if (evHome) {
-                evHome.innerHTML = eventosData.slice(0, 2).map(e => `
+                evHome.innerHTML = listaEventos.slice(0, 2).map(e => `
                     <div class="p-3.5 rounded-xl bg-white/10 border border-white/10">
                         <span class="text-[10px] font-bold text-amber-400">${e.data}</span>
                         <h4 class="font-bold text-xs text-white mt-0.5">${e.titulo}</h4>
@@ -1346,7 +1482,7 @@
 
             const futGrid = document.getElementById('eventos-futuros-grid');
             if (futGrid) {
-                futGrid.innerHTML = eventosData.filter(e => e.estado === 'futuro').map(e => `
+                futGrid.innerHTML = listaEventos.filter(e => e.estado === 'futuro').map(e => `
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <span class="text-xs font-bold text-emerald-600">${e.data}</span>
                         <h4 class="font-extrabold text-navy-900 text-base mt-1">${e.titulo}</h4>
@@ -1357,7 +1493,7 @@
 
             const realGrid = document.getElementById('eventos-realizados-grid');
             if (realGrid) {
-                realGrid.innerHTML = eventosData.filter(e => e.estado === 'realizado').map(e => `
+                realGrid.innerHTML = listaEventos.filter(e => e.estado === 'realizado').map(e => `
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <span class="text-xs font-bold text-slate-500">${e.data}</span>
                         <h4 class="font-extrabold text-navy-900 text-base mt-1">${e.titulo}</h4>
@@ -1379,6 +1515,7 @@
 
         window.onload = () => {
             renderAllSections();
+            carregarConteudosRemotos();
             const initialHash = window.location.hash.replace('#', '');
             if (initialHash && document.getElementById('view-' + initialHash)) {
                 navigateTo(initialHash, false);

@@ -228,18 +228,18 @@
                 </div>
             </div>
 
-            <!-- MÓDULO 4: INSERIR DOCUMENTOS NA BIBLIOTECA (COM JANELA DO COMPUTADOR) -->
+            <!-- MÓDULO 4: INSERIR DOCUMENTOS NA BIBLIOTECA (COM JANELA DO COMPUTADOR / TELEFONE) -->
             <div id="panel-biblioteca" class="admin-panel hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <div>
                         <span class="text-[10px] font-black uppercase text-indigo-600">Acervo Científico</span>
-                        <h3 class="text-lg font-black text-navy-900">Inserir Documento do Computador</h3>
+                        <h3 class="text-lg font-black text-navy-900">Inserir Documento</h3>
                     </div>
                     <form onsubmit="adicionarDocumentoBiblioteca(event)" class="space-y-3">
                         <input type="file" id="doc-file-input" class="hidden" onchange="aoSelecionarFicheiroComputador(event)">
                         <div class="p-4 bg-indigo-50/60 border-2 border-dashed border-indigo-200 rounded-2xl text-center space-y-2">
                             <button type="button" onclick="document.getElementById('doc-file-input').click()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black inline-flex items-center gap-2 transition">
-                                <i class="fa-solid fa-folder-open"></i> Escolher Ficheiro do Computador
+                                <i class="fa-solid fa-folder-open"></i> Escolher Ficheiro
                             </button>
                             <p id="doc-file-nome" class="text-[11px] font-bold text-slate-600">Nenhum ficheiro selecionado ainda.</p>
                         </div>
@@ -251,7 +251,7 @@
                         </div>
                         <input type="text" id="doc-url" placeholder="URL opcional (preenchido automaticamente ao escolher ficheiro)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
                         <textarea id="doc-desc" rows="3" required placeholder="Descrição do documento..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"></textarea>
-                        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs transition">
+                        <button type="submit" id="btn-salvar-doc" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs transition">
                             Inserir Documento na Biblioteca
                         </button>
                     </form>
@@ -275,13 +275,36 @@
     <!-- SCRIPT DE GESTÃO E LIGAÇÃO À NUVEM -->
     <script>
         const API_URL = 'https://isombaka-api.onrender.com';
-        const TIMEOUT_MS = 3500;
+        const TIMEOUT_MS = 10000;
+        const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8 MB para não travar browsers mobile
+
         let storedPassword = '';
         let inscricoesCache = [];
         let ficheiroSelecionadoDataUrl = '';
+        let nomeFicheiroOriginal = '';
+        let lendoFicheiro = false;
 
-        let codigosEmitidos = JSON.parse(localStorage.getItem('isombaka_codigos_emitidos') || '[]');
-        let direcoesCursos = JSON.parse(localStorage.getItem('isombaka_direcoes_cursos') || 'null') || {
+        function lerJsonSeguro(chave, fallback) {
+            try {
+                const raw = localStorage.getItem(chave);
+                return raw ? JSON.parse(raw) : fallback;
+            } catch (_) {
+                return fallback;
+            }
+        }
+
+        function guardarLocalSeguro(chave, valor) {
+            try {
+                localStorage.setItem(chave, typeof valor === 'string' ? valor : JSON.stringify(valor));
+                return true;
+            } catch (err) {
+                console.warn('LocalStorage cheio ou indisponível para:', chave, err);
+                return false;
+            }
+        }
+
+        let codigosEmitidos = lerJsonSeguro('isombaka_codigos_emitidos', []);
+        let direcoesCursos = lerJsonSeguro('isombaka_direcoes_cursos', null) || {
             principais: { pres: 'Prof. Dr. Mário Santos', vice: 'Prof. Dra. Teresa Lima', sec: 'Secretariado Geral das Ligas', prec: 'Dr. Armando Kanjila' },
             'Enfermagem': { pres: 'Enf. Sofia Domingos', vice: 'Enf. Maria José', sec: 'Secretariado de Enfermagem', prec: 'Prof. Ana Paula' },
             'Fisioterapia': { pres: 'Dr. Manuel Silva', vice: 'Ana Costa', sec: 'Secretariado de Fisioterapia', prec: 'Prof. Dr. Mário Santos' },
@@ -289,7 +312,7 @@
             'Medicina Dentária': { pres: 'Dr. Samuel Kapele', vice: 'Rosa Mbala', sec: 'Secretariado de Medicina Dentária', prec: 'Prof. Dra. Cristina Matos' },
             'Análises Clínicas': { pres: 'Dr. Nelson Bunga', vice: 'Teresa Chimuco', sec: 'Secretariado de Análises Clínicas', prec: 'Prof. Dr. Roberto Silva' }
         };
-        let direcoesLigas = JSON.parse(localStorage.getItem('isombaka_direcoes_ligas') || 'null') || {
+        let direcoesLigas = lerJsonSeguro('isombaka_direcoes_ligas', null) || {
             laas: { pres: 'Dr. Manuel Silva', vice: 'Ana Costa', sec: 'Carlos Alberto', prec: 'Prof. Dr. Mário Santos' },
             lafc: { pres: 'Dra. Beatriz Sousa', vice: 'João Pedro', sec: 'Helena Matos', prec: 'Prof. Dra. Teresa Lima' },
             laep: { pres: 'Enf. Sofia Domingos', vice: 'Paula Vicente', sec: 'Rui Manuel', prec: 'Prof. Ana Paula' },
@@ -299,20 +322,50 @@
             lafem: { pres: 'Enf. Paulo Antunes', vice: 'Joana Cossa', sec: 'Emanuel Tati', prec: 'Prof. Dr. Armando Santos' },
             laemc: { pres: 'Dr. Samuel Kapele', vice: 'Rosa Mbala', sec: 'Braulio Junior', prec: 'Prof. Dra. Cristina Matos' }
         };
-        let noticiasAdmin = JSON.parse(localStorage.getItem('isombaka_noticias') || '[]');
-        let eventosAdmin = JSON.parse(localStorage.getItem('isombaka_eventos') || '[]');
-        let bibliotecaAdmin = JSON.parse(localStorage.getItem('isombaka_biblioteca_docs') || '[]');
+        let noticiasAdmin = lerJsonSeguro('isombaka_noticias', []);
+        let eventosAdmin = lerJsonSeguro('isombaka_eventos', []);
+        let bibliotecaAdmin = lerJsonSeguro('isombaka_biblioteca_docs', []);
 
-        function salvarEstadoLocal() {
-            localStorage.setItem('isombaka_codigos_emitidos', JSON.stringify(codigosEmitidos));
-            localStorage.setItem('isombaka_direcoes_cursos', JSON.stringify(direcoesCursos));
-            localStorage.setItem('isombaka_direcoes_ligas', JSON.stringify(direcoesLigas));
-            localStorage.setItem('isombaka_noticias', JSON.stringify(noticiasAdmin));
-            localStorage.setItem('isombaka_eventos', JSON.stringify(eventosAdmin));
-            localStorage.setItem('isombaka_biblioteca_docs', JSON.stringify(bibliotecaAdmin));
+        async function sincronizarConteudosDaNuvem() {
+            try {
+                const resp = await fetchComTimeout(`${API_URL}/api/conteudos`, {}, 15000);
+                if (!resp.ok) return;
+                const data = await resp.json();
+                const d = data?.dados || data;
+                if (!d || typeof d !== 'object') return;
 
-            if (storedPassword) {
-                fetchComTimeout(`${API_URL}/api/admin/conteudos`, {
+                if (d.direcoesCursos) direcoesCursos = { ...direcoesCursos, ...d.direcoesCursos };
+                if (d.direcoesLigas) direcoesLigas = { ...direcoesLigas, ...d.direcoesLigas };
+                if (Array.isArray(d.noticias)) noticiasAdmin = d.noticias;
+                if (Array.isArray(d.eventos)) eventosAdmin = d.eventos;
+                if (Array.isArray(d.biblioteca)) bibliotecaAdmin = d.biblioteca;
+
+                guardarLocalSeguro('isombaka_direcoes_cursos', direcoesCursos);
+                guardarLocalSeguro('isombaka_direcoes_ligas', direcoesLigas);
+                guardarLocalSeguro('isombaka_noticias', noticiasAdmin);
+                guardarLocalSeguro('isombaka_eventos', eventosAdmin);
+                guardarLocalSeguro('isombaka_biblioteca_docs', bibliotecaAdmin);
+
+                preencherDirecaoCurso();
+                preencherDirecaoLiga();
+                renderizarConteudosEBiblioteca();
+            } catch (err) {
+                console.warn('Falha ao buscar conteúdos iniciais da API:', err);
+            }
+        }
+
+        async function salvarEstadoLocal(comAlertaRemoto = false) {
+            guardarLocalSeguro('isombaka_codigos_emitidos', codigosEmitidos);
+            guardarLocalSeguro('isombaka_direcoes_cursos', direcoesCursos);
+            guardarLocalSeguro('isombaka_direcoes_ligas', direcoesLigas);
+            guardarLocalSeguro('isombaka_noticias', noticiasAdmin);
+            guardarLocalSeguro('isombaka_eventos', eventosAdmin);
+            guardarLocalSeguro('isombaka_biblioteca_docs', bibliotecaAdmin);
+
+            if (!storedPassword) return { ok: false, motivo: 'sem_senha' };
+
+            try {
+                const resp = await fetchComTimeout(`${API_URL}/api/admin/conteudos`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -325,7 +378,22 @@
                             biblioteca: bibliotecaAdmin
                         }
                     })
-                }, 6000).catch(err => console.warn('Sync conteúdos pendente:', err));
+                }, 25000);
+
+                const resJson = await resp.json().catch(() => ({}));
+                if (resp.ok && resJson.sucesso !== false) {
+                    return { ok: true };
+                }
+                if (comAlertaRemoto) {
+                    alert('⚠️ Guardado no dispositivo, mas o servidor recusou ou devolveu aviso: ' + (resJson.mensagem || resp.status));
+                }
+                return { ok: false, motivo: resJson.mensagem || resp.status };
+            } catch (err) {
+                console.warn('Sync conteúdos pendente:', err);
+                if (comAlertaRemoto) {
+                    alert('⚠️ Guardado no dispositivo. A sincronização com a nuvem demorou ou está pendente — tente novamente em instantes.');
+                }
+                return { ok: false, motivo: err.message };
             }
         }
 
@@ -338,16 +406,16 @@
 
         function abrirDashboardImediato(pwd, dadosIniciais = null) {
             storedPassword = pwd;
-            localStorage.setItem('isombaka_admin_pwd_cache', pwd);
+            guardarLocalSeguro('isombaka_admin_pwd_cache', pwd);
             document.getElementById('auth-section').classList.add('hidden');
             document.getElementById('dashboard-section').classList.remove('hidden');
             document.getElementById('admin-user-info').classList.remove('hidden');
 
             if (Array.isArray(dadosIniciais)) {
                 inscricoesCache = dadosIniciais;
-                localStorage.setItem('isombaka_inscricoes_cache', JSON.stringify(dadosIniciais));
+                guardarLocalSeguro('isombaka_inscricoes_cache', dadosIniciais);
             } else {
-                inscricoesCache = JSON.parse(localStorage.getItem('isombaka_inscricoes_cache') || '[]');
+                inscricoesCache = lerJsonSeguro('isombaka_inscricoes_cache', []);
             }
 
             renderizarTabela(inscricoesCache);
@@ -355,6 +423,7 @@
             preencherDirecaoCurso();
             preencherDirecaoLiga();
             renderizarConteudosEBiblioteca();
+            sincronizarConteudosDaNuvem();
         }
 
         function gerarCodigoPorMatricula(matricula) {
@@ -383,7 +452,7 @@
             const pwd = document.getElementById('input-password').value.trim();
             const errorMsg = document.getElementById('auth-error');
             const btnLogin = document.getElementById('btn-login');
-            
+
             errorMsg.classList.add('hidden');
             btnLogin.disabled = true;
             btnLogin.innerText = 'A entrar...';
@@ -419,13 +488,13 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: storedPassword })
-                }, 8000);
+                }, 12000);
 
                 if (response.ok) {
                     const data = await response.json();
                     if (data.sucesso) {
                         inscricoesCache = data.dados || [];
-                        localStorage.setItem('isombaka_inscricoes_cache', JSON.stringify(inscricoesCache));
+                        guardarLocalSeguro('isombaka_inscricoes_cache', inscricoesCache);
                         renderizarTabela(inscricoesCache);
                         renderizarCodigosEmitidos();
                     }
@@ -453,7 +522,7 @@
             inscricoes.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
-                
+
                 const estadoClass = item.estado_candidatura === 'Aceite' ? 'bg-emerald-100 text-emerald-800' :
                                     item.estado_candidatura === 'Em Espera' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800';
 
@@ -597,7 +666,7 @@ ISPOmbaka`;
                         assunto,
                         mensagem: corpo
                     })
-                }, 4000);
+                }, 6000);
 
                 if (resp.ok) {
                     const resData = await resp.json();
@@ -628,12 +697,11 @@ ISPOmbaka`;
                         codigo: codigoGerado,
                         data: new Date().toLocaleDateString('pt-PT')
                     });
-                    salvarEstadoLocal();
                 } else if (email && !existente.email) {
                     existente.email = email;
                     existente.liga = liga;
-                    salvarEstadoLocal();
                 }
+                guardarLocalSeguro('isombaka_codigos_emitidos', codigosEmitidos);
             }
 
             inscricoesCache = inscricoesCache.map(item =>
@@ -641,7 +709,7 @@ ISPOmbaka`;
                     ? { ...item, estado_candidatura: novoEstado, ...(codigoGerado ? { codigo_membro: codigoGerado } : {}) }
                     : item
             );
-            localStorage.setItem('isombaka_inscricoes_cache', JSON.stringify(inscricoesCache));
+            guardarLocalSeguro('isombaka_inscricoes_cache', inscricoesCache);
             renderizarTabela(inscricoesCache);
             renderizarCodigosEmitidos();
 
@@ -664,7 +732,7 @@ ISPOmbaka`;
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(bodyPayload)
-                }, 6000);
+                }, 8000);
             } catch (err) {
                 console.warn('Atualização local aplicada; sync remoto pendente:', err);
             }
@@ -675,8 +743,8 @@ ISPOmbaka`;
 
             inscricoesCache = inscricoesCache.filter(item => String(item.id) !== String(id));
             codigosEmitidos = codigosEmitidos.filter(c => String(c.inscricao_id) !== String(id));
-            localStorage.setItem('isombaka_inscricoes_cache', JSON.stringify(inscricoesCache));
-            salvarEstadoLocal();
+            guardarLocalSeguro('isombaka_inscricoes_cache', inscricoesCache);
+            guardarLocalSeguro('isombaka_codigos_emitidos', codigosEmitidos);
             renderizarTabela(inscricoesCache);
             renderizarCodigosEmitidos();
 
@@ -685,7 +753,7 @@ ISPOmbaka`;
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: storedPassword })
-                }, 6000);
+                }, 8000);
             } catch (err) {
                 console.warn('Remoção local aplicada; sync remoto pendente:', err);
             }
@@ -701,7 +769,7 @@ ISPOmbaka`;
             document.getElementById('dir-curso-prec').value = d.prec || '';
         }
 
-        function salvarDirecaoCurso(e) {
+        async function salvarDirecaoCurso(e) {
             e.preventDefault();
             const curso = document.getElementById('dir-curso-select').value;
             direcoesCursos[curso] = {
@@ -710,8 +778,8 @@ ISPOmbaka`;
                 sec: document.getElementById('dir-curso-sec').value.trim(),
                 prec: document.getElementById('dir-curso-prec').value.trim()
             };
-            salvarEstadoLocal();
-            alert('✅ Direcção do curso guardada!');
+            const res = await salvarEstadoLocal(true);
+            alert(res.ok ? '✅ Direcção do curso guardada na nuvem!' : '✅ Direcção do curso guardada localmente.');
         }
 
         function preencherDirecaoLiga() {
@@ -724,7 +792,7 @@ ISPOmbaka`;
             document.getElementById('dir-liga-prec').value = d.prec || '';
         }
 
-        function salvarDirecaoLiga(e) {
+        async function salvarDirecaoLiga(e) {
             e.preventDefault();
             const liga = document.getElementById('dir-liga-select').value;
             direcoesLigas[liga] = {
@@ -733,11 +801,11 @@ ISPOmbaka`;
                 sec: document.getElementById('dir-liga-sec').value.trim(),
                 prec: document.getElementById('dir-liga-prec').value.trim()
             };
-            salvarEstadoLocal();
-            alert('✅ Direcção da liga guardada!');
+            const res = await salvarEstadoLocal(true);
+            alert(res.ok ? '✅ Direcção da liga guardada na nuvem!' : '✅ Direcção da liga guardada localmente.');
         }
 
-        function adicionarNoticia(e) {
+        async function adicionarNoticia(e) {
             e.preventDefault();
             noticiasAdmin.unshift({
                 id: 'not-' + Date.now(),
@@ -746,19 +814,19 @@ ISPOmbaka`;
                 data: document.getElementById('not-data').value.trim(),
                 desc: document.getElementById('not-desc').value.trim()
             });
-            salvarEstadoLocal();
             renderizarConteudosEBiblioteca();
             e.target.reset();
-            alert('✅ Notícia adicionada!');
+            const res = await salvarEstadoLocal(true);
+            alert(res.ok ? '✅ Notícia publicada na nuvem!' : '✅ Notícia adicionada localmente.');
         }
 
-        function removerNoticia(idx) {
+        async function removerNoticia(idx) {
             noticiasAdmin.splice(idx, 1);
-            salvarEstadoLocal();
             renderizarConteudosEBiblioteca();
+            await salvarEstadoLocal(true);
         }
 
-        function adicionarEvento(e) {
+        async function adicionarEvento(e) {
             e.preventDefault();
             eventosAdmin.unshift({
                 id: 'ev-' + Date.now(),
@@ -767,23 +835,36 @@ ISPOmbaka`;
                 estado: document.getElementById('ev-estado').value,
                 desc: document.getElementById('ev-desc').value.trim()
             });
-            salvarEstadoLocal();
             renderizarConteudosEBiblioteca();
             e.target.reset();
-            alert('✅ Evento adicionado!');
+            const res = await salvarEstadoLocal(true);
+            alert(res.ok ? '✅ Evento guardado na nuvem!' : '✅ Evento adicionado localmente.');
         }
 
-        function removerEvento(idx) {
+        async function removerEvento(idx) {
             eventosAdmin.splice(idx, 1);
-            salvarEstadoLocal();
             renderizarConteudosEBiblioteca();
+            await salvarEstadoLocal(true);
         }
 
         function aoSelecionarFicheiroComputador(event) {
             const file = event.target.files?.[0];
             if (!file) return;
 
-            document.getElementById('doc-file-nome').innerText = `Ficheiro: ${file.name}`;
+            const statusEl = document.getElementById('doc-file-nome');
+
+            if (file.size > MAX_FILE_BYTES) {
+                statusEl.innerText = '⚠️ Ficheiro muito grande para o telemóvel (máx. 8 MB).';
+                event.target.value = '';
+                ficheiroSelecionadoDataUrl = '';
+                nomeFicheiroOriginal = '';
+                alert('⚠️ Para não travar no telemóvel, escolha um ficheiro de até 8 MB.');
+                return;
+            }
+
+            nomeFicheiroOriginal = file.name;
+            lendoFicheiro = true;
+            statusEl.innerText = `A ler ficheiro: ${file.name}...`;
 
             const partes = file.name.split('.');
             if (partes.length > 1) {
@@ -796,39 +877,64 @@ ISPOmbaka`;
             const reader = new FileReader();
             reader.onload = () => {
                 ficheiroSelecionadoDataUrl = reader.result;
+                lendoFicheiro = false;
                 document.getElementById('doc-url').value = file.name;
+                statusEl.innerText = `Ficheiro pronto: ${file.name}`;
+            };
+            reader.onerror = () => {
+                lendoFicheiro = false;
+                ficheiroSelecionadoDataUrl = '';
+                statusEl.innerText = '❌ Erro ao ler o ficheiro neste dispositivo.';
             };
             reader.readAsDataURL(file);
         }
 
-        function adicionarDocumentoBiblioteca(e) {
+        async function adicionarDocumentoBiblioteca(e) {
             e.preventDefault();
+
+            if (lendoFicheiro) {
+                alert('⏳ Aguarde a leitura do ficheiro terminar antes de inserir.');
+                return;
+            }
+
+            const btn = document.getElementById('btn-salvar-doc');
             const urlInput = document.getElementById('doc-url').value.trim();
             const urlFinal = ficheiroSelecionadoDataUrl || urlInput || '#';
 
-            bibliotecaAdmin.unshift({
-                id: 'doc-' + Date.now(),
-                titulo: document.getElementById('doc-titulo').value.trim(),
-                cat: document.getElementById('doc-cat').value.trim(),
-                formato: (document.getElementById('doc-formato').value.trim() || 'PDF').toUpperCase(),
-                url: urlFinal,
-                nomeFicheiro: urlInput || 'documento',
-                desc: document.getElementById('doc-desc').value.trim()
-            });
-            salvarEstadoLocal();
-            renderizarConteudosEBiblioteca();
+            btn.disabled = true;
+            btn.innerText = 'A guardar na biblioteca...';
 
-            ficheiroSelecionadoDataUrl = '';
-            document.getElementById('doc-file-input').value = '';
-            document.getElementById('doc-file-nome').innerText = 'Nenhum ficheiro selecionado ainda.';
-            e.target.reset();
-            alert('✅ Documento inserido na Biblioteca Digital!');
+            try {
+                bibliotecaAdmin.unshift({
+                    id: 'doc-' + Date.now(),
+                    titulo: document.getElementById('doc-titulo').value.trim(),
+                    cat: document.getElementById('doc-cat').value.trim(),
+                    formato: (document.getElementById('doc-formato').value.trim() || 'PDF').toUpperCase(),
+                    url: urlFinal,
+                    nomeFicheiro: nomeFicheiroOriginal || urlInput || 'documento',
+                    desc: document.getElementById('doc-desc').value.trim()
+                });
+
+                renderizarConteudosEBiblioteca();
+
+                ficheiroSelecionadoDataUrl = '';
+                nomeFicheiroOriginal = '';
+                document.getElementById('doc-file-input').value = '';
+                document.getElementById('doc-file-nome').innerText = 'Nenhum ficheiro selecionado ainda.';
+                e.target.reset();
+
+                const res = await salvarEstadoLocal(true);
+                alert(res.ok ? '✅ Documento inserido e sincronizado na nuvem!' : '✅ Documento adicionado localmente.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Inserir Documento na Biblioteca';
+            }
         }
 
-        function removerDocumentoBiblioteca(idx) {
+        async function removerDocumentoBiblioteca(idx) {
             bibliotecaAdmin.splice(idx, 1);
-            salvarEstadoLocal();
             renderizarConteudosEBiblioteca();
+            await salvarEstadoLocal(true);
         }
 
         function renderizarConteudosEBiblioteca() {
@@ -868,7 +974,8 @@ ISPOmbaka`;
 
         function logoutAdmin() {
             storedPassword = '';
-            localStorage.removeItem('isombaka_admin_pwd_cache');
+            guardarLocalSeguro('isombaka_admin_pwd_cache', '');
+            try { localStorage.removeItem('isombaka_admin_pwd_cache'); } catch (_) {}
             document.getElementById('dashboard-section').classList.add('hidden');
             document.getElementById('admin-user-info').classList.add('hidden');
             document.getElementById('auth-section').classList.remove('hidden');
